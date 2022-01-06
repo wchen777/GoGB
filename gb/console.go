@@ -8,3 +8,15 @@ type Console struct {
 	apu *APU // Gameboy APU
 
 }
+
+func (c *Console) Step() int {
+	return 0
+}
+
+func (c *Console) Save() {
+
+}
+
+func (c *Console) Load() {
+
+}
