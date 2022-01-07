@@ -28,6 +28,48 @@ type CPU struct {
 	reg Registers
 }
 
+/*
+	While the CPU only has 8 bit registers,
+	there are instructions that allow the game to read and write 16 bits
+	(i.e. 2 bytes) at the same time
+*/
+
+func (r *Registers) Get_BC() uint16 {
+	return (uint16(r.b) << 8) | uint16(r.c)
+}
+
+func (r *Registers) Get_DE() uint16 {
+	return (uint16(r.d) << 8) | uint16(r.e)
+}
+
+func (r *Registers) Get_HL() uint16 {
+	return (uint16(r.h) << 8) | uint16(r.l)
+}
+
+func (r *Registers) Set_BC(value uint16) {
+	r.b = uint8((value & 0xFF00) >> 8)
+	r.c = uint8(value & 0xFF)
+}
+
+func (r *Registers) Set_DE(value uint16) {
+	r.d = uint8((value & 0xFF00) >> 8)
+	r.e = uint8(value & 0xFF)
+}
+
+func (r *Registers) Set_HL(value uint16) {
+	r.h = uint8((value & 0xFF00) >> 8)
+	r.l = uint8(value & 0xFF)
+}
+
+/*
+	Flags register:
+
+		- Bit 7: Zero flag
+		- Bit 6: Subtract flag
+		- Bit 5: Half carry flag
+		- Bit 4: Carry flag
+*/
+
 var CLOCK_SPEED uint32 = 4194304
 var FRAME_RATE uint32 = 60
 var CYCLES_PER_FRAME uint32 = CLOCK_SPEED / FRAME_RATE
