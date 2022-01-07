@@ -2,6 +2,8 @@ package gb
 
 // The Gameboy CPU is an 8-bit processor w/ a 16-bit address space.
 
+// <----------------------------- REGISTERS -----------------------------> //
+
 /*
 
 The Gameboy CPU has the following registers:
@@ -22,10 +24,6 @@ type Registers struct {
 	f  uint8  // Flags
 	pc uint16 // Program Counter
 	sp uint16 // Stack Pointer
-}
-
-type CPU struct {
-	reg Registers
 }
 
 /*
@@ -69,6 +67,60 @@ func (r *Registers) Set_HL(value uint16) {
 		- Bit 5: Half carry flag
 		- Bit 4: Carry flag
 */
+
+func (r *Registers) Get_Zero_Flag() bool {
+	return ((r.f & 0x80) >> 7) == 1
+}
+
+func (r *Registers) Get_Subtract_Flag() bool {
+	return ((r.f & 0x40) >> 6) == 1
+}
+
+func (r *Registers) Get_Half_Carry_Flag() bool {
+	return ((r.f & 0x20) >> 5) == 1
+}
+
+func (r *Registers) Get_Carry_Flag() bool {
+	return ((r.f & 0x10) >> 4) == 1
+}
+
+func (r *Registers) Set_Zero_Flag(value bool) {
+	if value {
+		r.f |= 0x80
+	} else {
+		r.f &= 0x7F
+	}
+}
+
+func (r *Registers) Set_Subtract_Flag(value bool) {
+	if value {
+		r.f |= 0x40
+	} else {
+		r.f &= 0xBF
+	}
+}
+
+func (r *Registers) Set_Half_Carry_Flag(value bool) {
+	if value {
+		r.f |= 0x20
+	} else {
+		r.f &= 0xDF
+	}
+}
+
+func (r *Registers) Set_Carry_Flag(value bool) {
+	if value {
+		r.f |= 0x10
+	} else {
+		r.f &= 0xEF
+	}
+}
+
+// <----------------------------- INSTRUCTIONS -----------------------------> //
+
+type CPU struct {
+	reg Registers
+}
 
 var CLOCK_SPEED uint32 = 4194304
 var FRAME_RATE uint32 = 60
