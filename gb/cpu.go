@@ -32,29 +32,29 @@ type Registers struct {
 	(i.e. 2 bytes) at the same time
 */
 
-func (r *Registers) Get_BC() uint16 {
+func (r *Registers) GetBC() uint16 {
 	return (uint16(r.b) << 8) | uint16(r.c)
 }
 
-func (r *Registers) Get_DE() uint16 {
+func (r *Registers) GetDE() uint16 {
 	return (uint16(r.d) << 8) | uint16(r.e)
 }
 
-func (r *Registers) Get_HL() uint16 {
+func (r *Registers) GetHL() uint16 {
 	return (uint16(r.h) << 8) | uint16(r.l)
 }
 
-func (r *Registers) Set_BC(value uint16) {
+func (r *Registers) SetBC(value uint16) {
 	r.b = uint8((value & 0xFF00) >> 8)
 	r.c = uint8(value & 0xFF)
 }
 
-func (r *Registers) Set_DE(value uint16) {
+func (r *Registers) SetDE(value uint16) {
 	r.d = uint8((value & 0xFF00) >> 8)
 	r.e = uint8(value & 0xFF)
 }
 
-func (r *Registers) Set_HL(value uint16) {
+func (r *Registers) SetHL(value uint16) {
 	r.h = uint8((value & 0xFF00) >> 8)
 	r.l = uint8(value & 0xFF)
 }
@@ -68,23 +68,25 @@ func (r *Registers) Set_HL(value uint16) {
 		- Bit 4: Carry flag
 */
 
-func (r *Registers) Get_Zero_Flag() bool {
-	return ((r.f & 0x80) >> 7) == 1
+// returns 1 or 0 depending on the value of the flags
+func (r *Registers) GetZero() uint8 {
+	return (r.f & 0x80) >> 7
 }
 
-func (r *Registers) Get_Subtract_Flag() bool {
-	return ((r.f & 0x40) >> 6) == 1
+func (r *Registers) GetSubtract() uint8 {
+	return (r.f & 0x40) >> 6
 }
 
-func (r *Registers) Get_Half_Carry_Flag() bool {
-	return ((r.f & 0x20) >> 5) == 1
+func (r *Registers) GetHalfCarry() uint8 {
+	return (r.f & 0x20) >> 5
 }
 
-func (r *Registers) Get_Carry_Flag() bool {
-	return ((r.f & 0x10) >> 4) == 1
+func (r *Registers) GetCarry() uint8 {
+	return (r.f & 0x10) >> 4
 }
 
-func (r *Registers) Set_Zero_Flag(value bool) {
+// sets fkags to 0 or 1 depending on the value of the bool
+func (r *Registers) SetZero(value bool) {
 	if value {
 		r.f |= 0x80
 	} else {
@@ -92,7 +94,7 @@ func (r *Registers) Set_Zero_Flag(value bool) {
 	}
 }
 
-func (r *Registers) Set_Subtract_Flag(value bool) {
+func (r *Registers) SetSubtract(value bool) {
 	if value {
 		r.f |= 0x40
 	} else {
@@ -100,7 +102,7 @@ func (r *Registers) Set_Subtract_Flag(value bool) {
 	}
 }
 
-func (r *Registers) Set_Half_Carry_Flag(value bool) {
+func (r *Registers) SetHalfCarry(value bool) {
 	if value {
 		r.f |= 0x20
 	} else {
@@ -108,7 +110,7 @@ func (r *Registers) Set_Half_Carry_Flag(value bool) {
 	}
 }
 
-func (r *Registers) Set_Carry_Flag(value bool) {
+func (r *Registers) SetCarry(value bool) {
 	if value {
 		r.f |= 0x10
 	} else {
@@ -119,7 +121,37 @@ func (r *Registers) Set_Carry_Flag(value bool) {
 // <----------------------------- INSTRUCTIONS -----------------------------> //
 
 type CPU struct {
-	reg Registers
+	regs Registers
+}
+
+// ADC - Add with Carry
+func (cpu *CPU) ADC(value uint8) {
+
+	// add value of carry flag to value, accounting for overflow with uint16
+	result := uint16(value + cpu.regs.a + cpu.regs.GetCarry())
+
+	cpu.regs.SetZero(cpu.regs.a == value)
+	cpu.regs.SetSubtract(false)
+	cpu.regs.SetHalfCarry(((value & 0xF) + (cpu.regs.a & 0xF)) > 0xF)
+	cpu.regs.SetCarry((result & 0xff00) != 0)
+
+	// set the accumulator to the result
+	cpu.regs.a = uint8(result & 0xFF)
+}
+
+// <----------------------------- EXECUTION -----------------------------> //
+
+// Step uses the program counter to read an instruction from memory and executes it
+func (cpu *CPU) Step() int {
+	// Use the program counter to read the instruction byte from memory.
+
+	// Translate the byte to one of the instances of the Instruction enum
+
+	// If we can successfully translate the instruction call our execute method else panic which now returns the next program counter
+
+	// Set this next program counter on our CPU
+
+	return 0
 }
 
 var CLOCK_SPEED uint32 = 4194304
