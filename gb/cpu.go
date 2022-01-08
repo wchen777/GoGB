@@ -124,20 +124,47 @@ type CPU struct {
 	regs Registers
 }
 
+// ADD - Add (set destination)
+func (cpu *CPU) ADD(destination *uint8, value uint8) {
+	// Add the value to the accumulator and set the flags
+	result := uint16(*destination) + uint16(value)
+
+	// set destination to the result
+	*destination = uint8(result & 0xFF)
+
+	cpu.regs.SetCarry((result & 0xff00) != 0)
+	cpu.regs.SetZero(*destination == 0)
+	cpu.regs.SetHalfCarry(((*destination & 0x0F) + (value & 0x0F)) > 0xF)
+	cpu.regs.SetSubtract(false)
+
+}
+
 // ADC - Add with Carry
 func (cpu *CPU) ADC(value uint8) {
 
 	// add value of carry flag to value, accounting for overflow with uint16
 	result := uint16(value + cpu.regs.a + cpu.regs.GetCarry())
 
-	cpu.regs.SetZero(cpu.regs.a == value)
+	cpu.regs.SetZero(result == 0)
 	cpu.regs.SetSubtract(false)
-	cpu.regs.SetHalfCarry(((value & 0xF) + (cpu.regs.a & 0xF)) > 0xF)
+	cpu.regs.SetHalfCarry(((cpu.regs.a & 0x0F) + (value & 0x0F) + cpu.regs.GetCarry()) > 0xF)
 	cpu.regs.SetCarry((result & 0xff00) != 0)
 
 	// set the accumulator to the result
 	cpu.regs.a = uint8(result & 0xFF)
 }
+
+// // ADDHL - Add to HL
+// func (cpu *CPU) ADDHL(value uint16) {
+// 	// result := cpu.regs.GetHL() + value
+
+// 	// cpu.regs.SetZero(cpu.regs.GetHL() == value)
+// 	// cpu.regs.SetSubtract(false)
+// 	// cpu.regs.SetHalfCarry(((cpu.regs.GetHL() & 0xFFF) + (value & 0xFFF)) > 0xFFF)
+// 	// cpu.regs.SetCarry((result & 0xFFFF0000) != 0)
+
+// 	// cpu.regs.SetHL(result)
+// }
 
 // <----------------------------- EXECUTION -----------------------------> //
 
