@@ -143,7 +143,7 @@ func (cpu *CPU) ADD(destination *uint8, value uint8) {
 func (cpu *CPU) ADC(value uint8) {
 
 	// add value of carry flag to value, accounting for overflow with uint16
-	result := uint16(value + cpu.regs.a + cpu.regs.GetCarry())
+	result := uint16(value) + uint16(cpu.regs.a) + uint16(cpu.regs.GetCarry())
 
 	cpu.regs.SetZero(result == 0)
 	cpu.regs.SetSubtract(false)
@@ -152,6 +152,32 @@ func (cpu *CPU) ADC(value uint8) {
 
 	// set the accumulator to the result
 	cpu.regs.a = uint8(result & 0xFF)
+}
+
+// SUB - Subtract
+func (cpu *CPU) SUB(value uint8) {
+
+	cpu.regs.SetCarry(cpu.regs.a < value)
+	cpu.regs.SetHalfCarry((cpu.regs.a & 0x0F) < (value & 0x0F))
+	cpu.regs.SetSubtract(true)
+
+	cpu.regs.a -= value
+	cpu.regs.SetZero(cpu.regs.a == 0)
+
+}
+
+// SBC - Subtract with Carry
+func (cpu *CPU) SBC(value uint8) {
+
+	newValue := value + cpu.regs.GetCarry()
+
+	cpu.regs.SetCarry(cpu.regs.a < newValue)
+	cpu.regs.SetHalfCarry((cpu.regs.a & 0x0F) < (newValue & 0x0F))
+	cpu.regs.SetSubtract(true)
+
+	cpu.regs.a -= newValue
+	cpu.regs.SetZero(cpu.regs.a == 0)
+
 }
 
 // // ADDHL - Add to HL
