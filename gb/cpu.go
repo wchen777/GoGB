@@ -180,17 +180,42 @@ func (cpu *CPU) SBC(value uint8) {
 
 }
 
-// // ADDHL - Add to HL
-// func (cpu *CPU) ADDHL(value uint16) {
-// 	// result := cpu.regs.GetHL() + value
+// AND - Logical AND
+func (cpu *CPU) AND(value uint8) {
+	cpu.regs.a &= value
+	cpu.regs.SetZero(cpu.regs.a == 0)
+	cpu.regs.SetSubtract(false)
+	cpu.regs.SetHalfCarry(true)
+	cpu.regs.SetCarry(false)
+}
 
-// 	// cpu.regs.SetZero(cpu.regs.GetHL() == value)
-// 	// cpu.regs.SetSubtract(false)
-// 	// cpu.regs.SetHalfCarry(((cpu.regs.GetHL() & 0xFFF) + (value & 0xFFF)) > 0xFFF)
-// 	// cpu.regs.SetCarry((result & 0xFFFF0000) != 0)
+// OR - Logical OR
+func (cpu *CPU) OR(value uint8) {
+	cpu.regs.a |= value
+	cpu.regs.SetZero(cpu.regs.a == 0)
+	cpu.regs.SetSubtract(false)
+	cpu.regs.SetHalfCarry(false)
+	cpu.regs.SetCarry(false)
 
-// 	// cpu.regs.SetHL(result)
-// }
+}
+
+// XOR - Logical XOR
+func (cpu *CPU) XOR(value uint8) {
+	cpu.regs.a ^= value
+	cpu.regs.SetZero(cpu.regs.a == 0)
+	cpu.regs.SetSubtract(false)
+	cpu.regs.SetHalfCarry(false)
+	cpu.regs.SetCarry(false)
+
+}
+
+// CP - Compare
+func (cpu *CPU) CP(value uint8) {
+	cpu.regs.SetZero(cpu.regs.a == value)
+	cpu.regs.SetCarry(cpu.regs.a < value)
+	cpu.regs.SetHalfCarry((cpu.regs.a & 0x0F) < (value & 0x0F))
+	cpu.regs.SetSubtract(true)
+}
 
 // <----------------------------- EXECUTION -----------------------------> //
 
