@@ -118,25 +118,41 @@ func (r *Registers) SetCarry(value bool) {
 	}
 }
 
-// <----------------------------- INSTRUCTIONS -----------------------------> //
+// <----------------------------- CPU INSTRUCTIONS -----------------------------> //
 
 type CPU struct {
 	regs Registers
 }
 
-// ADD - Add (set destination)
-func (cpu *CPU) ADD(destination *uint8, value uint8) {
-	// Add the value to the accumulator and set the flags
-	result := uint16(*destination) + uint16(value)
+var stopped bool = false
 
-	// set destination to the result
-	*destination = uint8(result & 0xFF)
+// ADD - Add (w/ 8-bit address)
+func (cpu *CPU) ADD(address *uint8, value uint8) {
+	// Add the value to the accumulator and set the flags
+	result := uint16(*address) + uint16(value)
+
+	// set address to the result
+	*address = uint8(result & 0xFF)
 
 	cpu.regs.SetCarry((result & 0xff00) != 0)
-	cpu.regs.SetZero(*destination == 0)
-	cpu.regs.SetHalfCarry(((*destination & 0x0F) + (value & 0x0F)) > 0xF)
+	cpu.regs.SetZero(*address == 0)
+	cpu.regs.SetHalfCarry(((*address & 0x0F) + (value & 0x0F)) > 0xF)
 	cpu.regs.SetSubtract(false)
 
+}
+
+// ADD - Add (w/ 16-bit address)
+func (cpu *CPU) ADD_16(address *uint16, value uint16) {
+	// Add the value to the accumulator and set the flags
+	result := uint32(*address + value)
+
+	// set address to the result
+	*address = uint16(result & 0xFFFF)
+
+	cpu.regs.SetCarry((result & 0xFFFF0000) != 0)
+	cpu.regs.SetZero(*address == 0)
+	cpu.regs.SetHalfCarry(((*address & 0x0F) + (value & 0x0F)) > 0xF)
+	cpu.regs.SetSubtract(false)
 }
 
 // ADC - Add with Carry
@@ -217,7 +233,183 @@ func (cpu *CPU) CP(value uint8) {
 	cpu.regs.SetSubtract(true)
 }
 
+// INC - Increment
+func (cpu *CPU) INC(value uint8) uint8 {
+	cpu.regs.SetHalfCarry((value & 0x0F) == 0x0F)
+	cpu.regs.SetSubtract(false)
+
+	value++
+	cpu.regs.SetZero(value == 0)
+
+	return value
+}
+
+// DEC - Decrement
+func (cpu *CPU) DEC(value uint8) uint8 {
+	cpu.regs.SetHalfCarry((value & 0x0F) == 0)
+	cpu.regs.SetSubtract(true)
+
+	value--
+	cpu.regs.SetZero(value == 0)
+
+	return value
+}
+
+// <----------------------------- OPCODES + INSTRUCTIONS -----------------------------> //
+
+// 0x00 - NOP
+func (cpu *CPU) NOP() {}
+
+// 0x01 - LD BC, d16 (d16 means 16 bit immediate value, operand will be from PC)
+func (cpu *CPU) LD_BC_d16(operand uint16) {
+	cpu.regs.b = uint8(operand >> 8)
+	cpu.regs.c = uint8(operand & 0xFF)
+}
+
+// 0x02 - LD (BC), A
+func (cpu *CPU) LD_BC_A() {
+	// write at address bc the value of the accumulator
+
+	// cpu.Write(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c), cpu.regs.a)
+}
+
+// 0x03 - INC BC
+func (cpu *CPU) INC_BC() {
+	NN := uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c)
+	NN++
+	cpu.regs.b = uint8(NN >> 8)
+	cpu.regs.c = uint8(NN & 0xFF)
+}
+
+// 0x04 - INC B
+func (cpu *CPU) INC_B() {
+	cpu.regs.b = cpu.INC(cpu.regs.b)
+}
+
+// 0x05 - DEC B
+func (cpu *CPU) DEC_B() {
+	cpu.regs.b = cpu.DEC(cpu.regs.b)
+}
+
+// 0x06 - LD B, d8
+func (cpu *CPU) LD_B_d8(operand uint8) {
+	cpu.regs.b = operand
+}
+
+// 0x07 - RLCA (rotate left through carry)
+func (cpu *CPU) RLCA() {
+	cpu.regs.a = (cpu.regs.a << 1) | (cpu.regs.a >> 7)
+
+	cpu.regs.SetZero(false)
+	cpu.regs.SetSubtract(false)
+	cpu.regs.SetHalfCarry(false)
+
+	// set the carry flag to bit 0
+	cpu.regs.SetCarry((cpu.regs.a & 0x01) != 0)
+
+}
+
+// 0x08 - LD (a16), SP (?)
+func (cpu *CPU) LD_a16_SP(operand uint16) {
+	// write the stack pointer to the address
+	// cpu.Write(operand, cpu.regs.sp)
+}
+
+// 0x09 - ADD HL, BC
+func (cpu *CPU) ADD_HL_BC() {
+	// cpu.ADD(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c))
+}
+
+// 0x0A - LD A, (BC)
+func (cpu *CPU) LD_A_BC() {
+	// cpu.regs.a = cpu.Read(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c))
+}
+
+// 0x0B - DEC BC
+func (cpu *CPU) DEC_BC() {
+	NN := uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c)
+	NN--
+	cpu.regs.b = uint8(NN >> 8)
+	cpu.regs.c = uint8(NN & 0xFF)
+}
+
+// 0x0C - INC C
+func (cpu *CPU) INC_C() {
+	cpu.regs.c = cpu.INC(cpu.regs.c)
+}
+
+// 0x0D - DEC C
+func (cpu *CPU) DEC_C() {
+	cpu.regs.c = cpu.DEC(cpu.regs.c)
+}
+
+// 0x0E - LD C, d8
+func (cpu *CPU) LD_C_d8(operand uint8) {
+	cpu.regs.c = operand
+}
+
+// 0x0F - RRCA (rotate right through carry)
+func (cpu *CPU) RRCA() {
+	// set the carry flag to bit 0
+	cpu.regs.SetCarry((cpu.regs.a & 0x01) != 0)
+
+	cpu.regs.a = (cpu.regs.a >> 1) | (cpu.regs.a << 7)
+
+	cpu.regs.SetZero(false)
+	cpu.regs.SetSubtract(false)
+	cpu.regs.SetHalfCarry(false)
+
+}
+
+// 0x10 - STOP
+func (cpu *CPU) STOP() {
+	stopped := true
+}
+
+// 0x11 - LD DE, d16 (d16 means 16 bit immediate value, operand will be from PC)
+func (cpu *CPU) LD_DE_d16(operand uint16) {
+	cpu.regs.d = uint8(operand >> 8)
+	cpu.regs.e = uint8(operand & 0xFF)
+}
+
+// 0x12 - LD (DE), A
+func (cpu *CPU) LD_DE_A() {
+	// write at address bc the value of the accumulator
+
+	// cpu.Write(uint16(cpu.regs.d)<<8 | uint16(cpu.regs.e), cpu.regs.a)
+}
+
+// 0x13 - INC DE
+func (cpu *CPU) INC_DE() {
+	NN := uint16(cpu.regs.d)<<8 | uint16(cpu.regs.e)
+	NN++
+	cpu.regs.d = uint8(NN >> 8)
+	cpu.regs.e = uint8(NN & 0xFF)
+}
+
 // <----------------------------- EXECUTION -----------------------------> //
+
+// Reads and Writes
+
+// Write an 8-bit value to the address
+func (cpu *CPU) Write8(address uint16, value uint8) {
+
+}
+
+// Read an 8-bit value from the address
+func (cpu *CPU) Read8(address uint16) uint8 {
+	return 0
+}
+
+// Write a 16-bit value to the address
+func (cpu *CPU) Write16(address uint16, value uint16) {
+
+}
+
+// Read a 16-bit value from the address
+func (cpu *CPU) Read16(address uint16) uint16 {
+	return 0
+}
 
 // Step uses the program counter to read an instruction from memory and executes it
 func (cpu *CPU) Step() int {
