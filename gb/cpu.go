@@ -271,7 +271,7 @@ func (cpu *CPU) LD_BC_d16(operand uint16) {
 func (cpu *CPU) LD_BC_A() {
 	// write at address bc the value of the accumulator
 
-	// cpu.mem.Write16(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c), cpu.regs.a)
+	cpu.mem.Write8(uint16(cpu.regs.b)<<8|uint16(cpu.regs.c), cpu.regs.a)
 }
 
 // 0x03 - INC BC
@@ -313,17 +313,18 @@ func (cpu *CPU) RLCA() {
 // 0x08 - LD (a16), SP (?)
 func (cpu *CPU) LD_a16_SP(operand uint16) {
 	// write the stack pointer to the address
-	// cpu.Write(operand, cpu.regs.sp)
+	cpu.mem.Write16(operand, cpu.regs.sp)
 }
 
 // 0x09 - ADD HL, BC
 func (cpu *CPU) ADD_HL_BC() {
-	// cpu.ADD(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c))
+	// what to do with the address being passed in
+	// cpu.ADD_16(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c), uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l))
 }
 
 // 0x0A - LD A, (BC)
 func (cpu *CPU) LD_A_BC() {
-	// cpu.regs.a = cpu.Read(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c))
+	cpu.regs.a = cpu.mem.Read8(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c))
 }
 
 // 0x0B - DEC BC
@@ -377,7 +378,7 @@ func (cpu *CPU) LD_DE_d16(operand uint16) {
 func (cpu *CPU) LD_DE_A() {
 	// write at address bc the value of the accumulator
 
-	// cpu.Write(uint16(cpu.regs.d)<<8 | uint16(cpu.regs.e), cpu.regs.a)
+	cpu.mem.Write8(uint16(cpu.regs.d)<<8|uint16(cpu.regs.e), cpu.regs.a)
 }
 
 // 0x13 - INC DE
