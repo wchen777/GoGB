@@ -30,7 +30,27 @@ $0000-$00FF	Restart and Interrupt Vectors
 
 // Memory = [0x10000]uint8{}
 
-type Memory interface {
-	Read(address uint16) byte
-	Write(address uint16, value byte)
+type Memory struct {
+}
+
+// Reads and Writes
+
+// Write an 8-bit value to the address
+func (mem *Memory) Write8(address uint16, value uint8) {
+
+}
+
+// Read an 8-bit value from the address
+func (mem *Memory) Read8(address uint16) uint8 {
+	return 0
+}
+
+// Write a 16-bit value to the address
+func (mem *Memory) Write16(address uint16, value uint16) {
+
+}
+
+// Read a 16-bit value from the address
+func (mem *Memory) Read16(address uint16) uint16 {
+	return 0
 }

@@ -122,6 +122,7 @@ func (r *Registers) SetCarry(value bool) {
 
 type CPU struct {
 	regs Registers
+	mem  Memory
 }
 
 var stopped bool = false
@@ -270,7 +271,7 @@ func (cpu *CPU) LD_BC_d16(operand uint16) {
 func (cpu *CPU) LD_BC_A() {
 	// write at address bc the value of the accumulator
 
-	// cpu.Write(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c), cpu.regs.a)
+	// cpu.mem.Write16(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c), cpu.regs.a)
 }
 
 // 0x03 - INC BC
@@ -388,28 +389,6 @@ func (cpu *CPU) INC_DE() {
 }
 
 // <----------------------------- EXECUTION -----------------------------> //
-
-// Reads and Writes
-
-// Write an 8-bit value to the address
-func (cpu *CPU) Write8(address uint16, value uint8) {
-
-}
-
-// Read an 8-bit value from the address
-func (cpu *CPU) Read8(address uint16) uint8 {
-	return 0
-}
-
-// Write a 16-bit value to the address
-func (cpu *CPU) Write16(address uint16, value uint16) {
-
-}
-
-// Read a 16-bit value from the address
-func (cpu *CPU) Read16(address uint16) uint16 {
-	return 0
-}
 
 // Step uses the program counter to read an instruction from memory and executes it
 func (cpu *CPU) Step() int {
