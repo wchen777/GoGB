@@ -1,8 +1,8 @@
 package gb
 
-// GameBoy Memory Areas
-
 /*
+
+GameBoy Memory Areas
 
 $FFFF	Interrupt Enable Flag
 $FF80-$FFFE	Zero Page - 127 bytes
@@ -23,14 +23,16 @@ $0000-$00FF	Restart and Interrupt Vectors
 
 */
 
-// create 64kb memory map
-// type Memory struct {
-
-// }
-
-// Memory = [0x10000]uint8{}
+// 64kb memory map
 
 type Memory struct {
+	cart [0x8000]uint8
+	sram [0x2000]uint8
+	vram [0x2000]uint8
+	wram [0x2000]uint8
+	oam  [0x100]uint8
+	hram [0x80]uint8
+	io   [0x100]uint8
 }
 
 // Reads and Writes

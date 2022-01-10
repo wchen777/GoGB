@@ -263,8 +263,7 @@ func (cpu *CPU) NOP() {}
 
 // 0x01 - LD BC, d16 (d16 means 16 bit immediate value, operand will be from PC)
 func (cpu *CPU) LD_BC_d16(operand uint16) {
-	cpu.regs.b = uint8(operand >> 8)
-	cpu.regs.c = uint8(operand & 0xFF)
+	cpu.regs.SetBC(operand)
 }
 
 // 0x02 - LD (BC), A
@@ -278,8 +277,7 @@ func (cpu *CPU) LD_BC_A() {
 func (cpu *CPU) INC_BC() {
 	NN := uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c)
 	NN++
-	cpu.regs.b = uint8(NN >> 8)
-	cpu.regs.c = uint8(NN & 0xFF)
+	cpu.regs.SetBC(NN)
 }
 
 // 0x04 - INC B
@@ -331,8 +329,7 @@ func (cpu *CPU) LD_A_BC() {
 func (cpu *CPU) DEC_BC() {
 	NN := uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c)
 	NN--
-	cpu.regs.b = uint8(NN >> 8)
-	cpu.regs.c = uint8(NN & 0xFF)
+	cpu.regs.SetBC(NN)
 }
 
 // 0x0C - INC C
@@ -370,8 +367,7 @@ func (cpu *CPU) STOP() {
 
 // 0x11 - LD DE, d16 (d16 means 16 bit immediate value, operand will be from PC)
 func (cpu *CPU) LD_DE_d16(operand uint16) {
-	cpu.regs.d = uint8(operand >> 8)
-	cpu.regs.e = uint8(operand & 0xFF)
+	cpu.regs.SetDE(operand)
 }
 
 // 0x12 - LD (DE), A
@@ -385,9 +381,25 @@ func (cpu *CPU) LD_DE_A() {
 func (cpu *CPU) INC_DE() {
 	NN := uint16(cpu.regs.d)<<8 | uint16(cpu.regs.e)
 	NN++
-	cpu.regs.d = uint8(NN >> 8)
-	cpu.regs.e = uint8(NN & 0xFF)
+	cpu.regs.SetDE(NN)
 }
+
+// 0x14 - INC D
+func (cpu *CPU) INC_D() {
+	cpu.regs.d = cpu.INC(cpu.regs.d)
+}
+
+// 0x15 - DEC D
+func (cpu *CPU) DEC_D() {
+	cpu.regs.d = cpu.DEC(cpu.regs.d)
+}
+
+// 0x16 - LD D, d8
+func (cpu *CPU) LD_D_d8(operand uint8) {
+	cpu.regs.d = operand
+}
+
+// 0x17 - RLA (rotate left through carry)
 
 // <----------------------------- EXECUTION -----------------------------> //
 
