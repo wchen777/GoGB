@@ -400,6 +400,102 @@ func (cpu *CPU) LD_D_d8(operand uint8) {
 }
 
 // 0x17 - RLA (rotate left through carry)
+func (cpu *CPU) RLA() {
+
+	// TODO: CHECK THIS
+
+	// set the carry flag to bit 0
+	cpu.regs.SetCarry((cpu.regs.a & 0x80) != 0)
+
+	cpu.regs.a = (cpu.regs.a << 1) | (cpu.regs.a >> 7)
+
+	cpu.regs.SetZero(false)
+	cpu.regs.SetSubtract(false)
+	cpu.regs.SetHalfCarry(false)
+
+}
+
+// 0x18 - JR r8 (r8 means 8 bit immediate value, operand will be from PC)
+func (cpu *CPU) JR_r8(operand uint8) {
+	cpu.regs.pc += uint16(operand)
+}
+
+// 0x19 - ADD HL, DE
+func (cpu *CPU) ADD_HL_DE() {
+	// what to do with the address being passed in
+	// cpu.ADD_16(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c), uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l))
+}
+
+// cpu.ADD_16(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c), uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l))
+
+// 0x1A - LD A, (DE)
+func (cpu *CPU) LD_A_DE() {
+	cpu.regs.a = cpu.mem.Read8(uint16(cpu.regs.d)<<8 | uint16(cpu.regs.e))
+}
+
+// 0x1B - DEC DE
+func (cpu *CPU) DEC_DE() {
+	NN := uint16(cpu.regs.d)<<8 | uint16(cpu.regs.e)
+	NN--
+	cpu.regs.SetDE(NN)
+}
+
+// 0x1C - INC E
+func (cpu *CPU) INC_E() {
+	cpu.regs.e = cpu.INC(cpu.regs.e)
+}
+
+// 0x1D - DEC E
+func (cpu *CPU) DEC_E() {
+	cpu.regs.e = cpu.DEC(cpu.regs.e)
+}
+
+// 0x1E - LD E, d8
+func (cpu *CPU) LD_E_d8(operand uint8) {
+	cpu.regs.e = operand
+}
+
+// 0x1F - RRA (rotate right through carry)
+func (cpu *CPU) RRA() {
+	// TODO: check this
+}
+
+// 0x20 - JR NZ, r8 (r8 means 8 bit immediate value, operand will be from PC)
+func (cpu *CPU) JR_NZ_r8(operand uint8) {
+	// TODO: check this
+	if cpu.regs.GetZero() == 0 {
+		cpu.regs.pc += uint16(operand)
+	}
+}
+
+// 0x21 - LD HL, d16 (d16 means 16 bit immediate value, operand will be from PC)
+func (cpu *CPU) LD_HL_d16(operand uint16) {
+	cpu.regs.SetHL(operand)
+}
+
+// 0x22 - LD (HL+), A
+func (cpu *CPU) LD_HL_A() {
+	// write at address bc the value of the accumulator
+
+	cpu.mem.Write8(uint16(cpu.regs.h)<<8|uint16(cpu.regs.l), cpu.regs.a)
+}
+
+// 0x23 - INC HL
+func (cpu *CPU) INC_HL() {
+	NN := uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l)
+	NN++
+	cpu.regs.SetHL(NN)
+}
+
+// 0x24 - INC H
+func (cpu *CPU) INC_H() {
+	cpu.regs.h = cpu.INC(cpu.regs.h)
+}
+
+// 0x25 - DEC H
+func (cpu *CPU) DEC_H() {
+	cpu.regs.h = cpu.DEC(cpu.regs.h)
+}
 
 // <----------------------------- EXECUTION -----------------------------> //
 
