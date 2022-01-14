@@ -272,12 +272,12 @@ func (cpu *CPU) LD_BC_d16(operand uint16) {
 func (cpu *CPU) LD_BC_A() {
 	// write at address bc the value of the accumulator
 
-	cpu.mem.Write8(uint16(cpu.regs.b)<<8|uint16(cpu.regs.c), cpu.regs.a)
+	cpu.mem.Write8(cpu.regs.GetBC(), cpu.regs.a)
 }
 
 // 0x03 - INC BC
 func (cpu *CPU) INC_BC() {
-	NN := uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c)
+	NN := cpu.regs.GetBC()
 	NN++
 	cpu.regs.SetBC(NN)
 }
@@ -318,17 +318,18 @@ func (cpu *CPU) LD_a16_SP(operand uint16) {
 
 // 0x09 - ADD HL, BC
 func (cpu *CPU) ADD_HL_BC() {
-	cpu.ADD_16(&uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l), uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c))
+	// TODO: why is this erroring?
+	// cpu.ADD_16(&cpu.regs.GetHL(), cpu.regs.GetBC())
 }
 
 // 0x0A - LD A, (BC)
 func (cpu *CPU) LD_A_BC() {
-	cpu.regs.a = cpu.mem.Read8(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c))
+	cpu.regs.a = cpu.mem.Read8(cpu.regs.GetBC())
 }
 
 // 0x0B - DEC BC
 func (cpu *CPU) DEC_BC() {
-	NN := uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c)
+	NN := cpu.regs.GetBC()
 	NN--
 	cpu.regs.SetBC(NN)
 }
@@ -374,12 +375,12 @@ func (cpu *CPU) LD_DE_d16(operand uint16) {
 // 0x12 - LD (DE), A
 func (cpu *CPU) LD_DE_A() {
 	// write at address bc the value of the accumulator
-	cpu.mem.Write8(uint16(cpu.regs.d)<<8|uint16(cpu.regs.e), cpu.regs.a)
+	cpu.mem.Write8(cpu.regs.GetDE(), cpu.regs.a)
 }
 
 // 0x13 - INC DE
 func (cpu *CPU) INC_DE() {
-	NN := uint16(cpu.regs.d)<<8 | uint16(cpu.regs.e)
+	NN := cpu.regs.GetDE()
 	NN++
 	cpu.regs.SetDE(NN)
 }
@@ -422,19 +423,20 @@ func (cpu *CPU) JR_r8(operand uint8) {
 
 // 0x19 - ADD HL, DE
 func (cpu *CPU) ADD_HL_DE() {
-	cpu.ADD_16(&uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l), uint16(cpu.regs.d)<<8 | uint16(cpu.regs.e))
+	// TODO: why is this erroring?
+	// cpu.ADD_16(&cpu.regs.GetHL(), cpu.regs.GetDE())
 }
 
-// cpu.ADD_16(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c), uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l))
+// cpu.ADD_16(cpu.regs.GetBC(), cpu.regs.GetHL())
 
 // 0x1A - LD A, (DE)
 func (cpu *CPU) LD_A_DE() {
-	cpu.regs.a = cpu.mem.Read8(uint16(cpu.regs.d)<<8 | uint16(cpu.regs.e))
+	cpu.regs.a = cpu.mem.Read8(cpu.regs.GetDE())
 }
 
 // 0x1B - DEC DE
 func (cpu *CPU) DEC_DE() {
-	NN := uint16(cpu.regs.d)<<8 | uint16(cpu.regs.e)
+	NN := cpu.regs.GetDE()
 	NN--
 	cpu.regs.SetDE(NN)
 }
@@ -474,12 +476,12 @@ func (cpu *CPU) LD_HL_d16(operand uint16) {
 
 // 0x22 - LD (HL+), A
 func (cpu *CPU) LD_HLp_A() {
-	cpu.mem.Write8(uint16(cpu.regs.h)<<8|uint16(cpu.regs.l), cpu.regs.a)
+	cpu.mem.Write8(cpu.regs.GetHL(), cpu.regs.a)
 }
 
 // 0x23 - INC HL
 func (cpu *CPU) INC_HL() {
-	NN := uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l)
+	NN := cpu.regs.GetHL()
 	NN++
 	cpu.regs.SetHL(NN)
 }
@@ -517,12 +519,12 @@ func (cpu *CPU) ADD_HL_HL() {
 
 // 0x2A - LD A, (HL+)
 func (cpu *CPU) LD_A_HLp() {
-	cpu.regs.a = cpu.mem.Read8(uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l))
+	cpu.regs.a = cpu.mem.Read8(cpu.regs.GetHL())
 }
 
 // 0x2B - DEC HL
 func (cpu *CPU) DEC_HL() {
-	NN := uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l)
+	NN := cpu.regs.GetHL()
 	NN--
 	cpu.regs.SetHL(NN)
 }
@@ -560,7 +562,7 @@ func (cpu *CPU) LD_SP_d16(operand uint16) {
 // 0x32 - LD (HL-), A
 func (cpu *CPU) LD_HLm_A() {
 	// write at address bc the value of the accumulator
-	cpu.mem.Write8(uint16(cpu.regs.h)<<8|uint16(cpu.regs.l), cpu.regs.a)
+	cpu.mem.Write8(cpu.regs.GetHL(), cpu.regs.a)
 }
 
 // 0x33 - INC SP
@@ -571,10 +573,21 @@ func (cpu *CPU) INC_SP() {
 // 0x34 - INC (HL+)
 func (cpu *CPU) INC_HLp() {
 	// set hl to be the increment of the value of the address at hl
-	cpu.regs.SetHL(cpu.INC(cpu.mem.Read8(uint16(cpu.regs.h)<<8|uint16(cpu.regs.l)))))
+	cpu.mem.Write8(cpu.regs.GetHL(), cpu.INC(cpu.mem.Read8(cpu.regs.GetHL())))
 }
 
+// 0x35 - DEC (HL+)
+func (cpu *CPU) DEC_HLp() {
+	// set hl to be the decrement of the value of the address at hl
+	cpu.mem.Write8(cpu.regs.GetHL(), cpu.DEC(cpu.mem.Read8(cpu.regs.GetHL())))
+}
 
+// 0x36 - LD (HL+), d8
+func (cpu *CPU) LD_HLp_d8(operand uint8) {
+	cpu.mem.Write8(cpu.regs.GetHL(), operand)
+}
+
+// 0x37 - SCF (set carry flag)
 
 // <----------------------------- EXECUTION -----------------------------> //
 
