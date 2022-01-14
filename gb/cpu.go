@@ -497,6 +497,26 @@ func (cpu *CPU) DEC_H() {
 	cpu.regs.h = cpu.DEC(cpu.regs.h)
 }
 
+// 0x26 - LD H, d8
+func (cpu *CPU) LD_H_d8(operand uint8) {
+	cpu.regs.h = operand
+}
+
+// 0x27 - DAA (decimal adjust accumulator)
+func (cpu *CPU) DAA() {
+	// TODO: this
+}
+
+// 0x28 - JR Z, r8
+func (cpu *CPU) JR_Z_r8(operand uint8) {
+
+}
+
+// 0x29 - ADD HL, HL
+func (cpu *CPU) ADD_HL_HL() {
+
+}
+
 // <----------------------------- EXECUTION -----------------------------> //
 
 // Step uses the program counter to read an instruction from memory and executes it
