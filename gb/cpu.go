@@ -258,6 +258,8 @@ func (cpu *CPU) DEC(value uint8) uint8 {
 
 // <----------------------------- OPCODES + INSTRUCTIONS -----------------------------> //
 
+// TODO: check all the + and - instructions
+
 // 0x00 - NOP
 func (cpu *CPU) NOP() {}
 
@@ -316,8 +318,7 @@ func (cpu *CPU) LD_a16_SP(operand uint16) {
 
 // 0x09 - ADD HL, BC
 func (cpu *CPU) ADD_HL_BC() {
-	// what to do with the address being passed in
-	// cpu.ADD_16(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c), uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l))
+	cpu.ADD_16(&uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l), uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c))
 }
 
 // 0x0A - LD A, (BC)
@@ -373,7 +374,6 @@ func (cpu *CPU) LD_DE_d16(operand uint16) {
 // 0x12 - LD (DE), A
 func (cpu *CPU) LD_DE_A() {
 	// write at address bc the value of the accumulator
-
 	cpu.mem.Write8(uint16(cpu.regs.d)<<8|uint16(cpu.regs.e), cpu.regs.a)
 }
 
@@ -422,8 +422,7 @@ func (cpu *CPU) JR_r8(operand uint8) {
 
 // 0x19 - ADD HL, DE
 func (cpu *CPU) ADD_HL_DE() {
-	// what to do with the address being passed in
-	// cpu.ADD_16(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c), uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l))
+	cpu.ADD_16(&uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l), uint16(cpu.regs.d)<<8 | uint16(cpu.regs.e))
 }
 
 // cpu.ADD_16(uint16(cpu.regs.b)<<8 | uint16(cpu.regs.c), uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l))
@@ -474,9 +473,7 @@ func (cpu *CPU) LD_HL_d16(operand uint16) {
 }
 
 // 0x22 - LD (HL+), A
-func (cpu *CPU) LD_HL_A() {
-	// write at address bc the value of the accumulator
-
+func (cpu *CPU) LD_HLp_A() {
 	cpu.mem.Write8(uint16(cpu.regs.h)<<8|uint16(cpu.regs.l), cpu.regs.a)
 }
 
@@ -505,6 +502,7 @@ func (cpu *CPU) LD_H_d8(operand uint8) {
 // 0x27 - DAA (decimal adjust accumulator)
 func (cpu *CPU) DAA() {
 	// TODO: this
+
 }
 
 // 0x28 - JR Z, r8
@@ -516,6 +514,67 @@ func (cpu *CPU) JR_Z_r8(operand uint8) {
 func (cpu *CPU) ADD_HL_HL() {
 
 }
+
+// 0x2A - LD A, (HL+)
+func (cpu *CPU) LD_A_HLp() {
+	cpu.regs.a = cpu.mem.Read8(uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l))
+}
+
+// 0x2B - DEC HL
+func (cpu *CPU) DEC_HL() {
+	NN := uint16(cpu.regs.h)<<8 | uint16(cpu.regs.l)
+	NN--
+	cpu.regs.SetHL(NN)
+}
+
+// 0x2C - INC L
+func (cpu *CPU) INC_L() {
+	cpu.regs.l = cpu.INC(cpu.regs.l)
+}
+
+// 0x2D - DEC L
+func (cpu *CPU) DEC_L() {
+	cpu.regs.l = cpu.DEC(cpu.regs.l)
+}
+
+// 0x2E - LD L, d8
+func (cpu *CPU) LD_L_d8(operand uint8) {
+	cpu.regs.l = operand
+}
+
+// 0x2F - CPL (complement accumulator)
+func (cpu *CPU) CPL() {
+	// TODO: this
+}
+
+// 0x30 - JR NC, r8
+func (cpu *CPU) JR_NC_r8(operand uint8) {
+	// TODO: this
+}
+
+// 0x31 - LD SP, d16
+func (cpu *CPU) LD_SP_d16(operand uint16) {
+	cpu.regs.sp = operand
+}
+
+// 0x32 - LD (HL-), A
+func (cpu *CPU) LD_HLm_A() {
+	// write at address bc the value of the accumulator
+	cpu.mem.Write8(uint16(cpu.regs.h)<<8|uint16(cpu.regs.l), cpu.regs.a)
+}
+
+// 0x33 - INC SP
+func (cpu *CPU) INC_SP() {
+	cpu.regs.sp++
+}
+
+// 0x34 - INC (HL+)
+func (cpu *CPU) INC_HLp() {
+	// set hl to be the increment of the value of the address at hl
+	cpu.regs.SetHL(cpu.INC(cpu.mem.Read8(uint16(cpu.regs.h)<<8|uint16(cpu.regs.l)))))
+}
+
+
 
 // <----------------------------- EXECUTION -----------------------------> //
 
