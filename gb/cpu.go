@@ -25,13 +25,16 @@ type OperandInfo struct {
 type Instruction struct {
 	name             string
 	instuctionLength uint8 // number of bytes for the instruction
-	instruction      func(*OperandInfo)
+	execute          func(*OperandInfo)
 }
 
 type CPU struct {
-	regs  Registers
-	mem   Memory
-	table [256]Instruction
+	regs       Registers
+	mem        Memory
+	table      [256]Instruction
+	ticksTable [256]uint8
+	ticks      uint32
+	stopped    bool
 }
 
 // <----------------------------- REGISTERS -----------------------------> //
@@ -138,8 +141,6 @@ func (r *Registers) SetCarry(value bool) {
 }
 
 // <----------------------------- CPU INSTRUCTIONS -----------------------------> //
-
-var stopped bool = false
 
 // ADD - Add (w/ 8-bit address)
 func (cpu *CPU) ADD(address *uint8, value uint8) {
@@ -378,7 +379,7 @@ func (cpu *CPU) RRCA(stepInfo *OperandInfo) {
 
 // 0x10 - STOP
 func (cpu *CPU) STOP(stepInfo *OperandInfo) {
-	stopped = true
+	cpu.stopped = true
 }
 
 // 0x11 - LD DE, d16 (d16 means 16 bit immediate value, operand will be from PC)
@@ -607,13 +608,66 @@ func (cpu *CPU) LD_HLp_d8(stepInfo *OperandInfo) {
 
 func (cpu *CPU) CreateTable() {
 	cpu.table = [256]Instruction{
-		{"NOP", 0, cpu.NOP},              // 0x00
-		{"LD BC, d16", 3, cpu.LD_BC_d16}, // 0x01
-		{"LD (BC), A", 1, cpu.LD_BC_A},   // 0x02
-		{"INC BC", 1, cpu.INC_BC},        // 0x03
-		{"INC B", 1, cpu.INC_B},          // 0x04
-		{"DEC B", 1, cpu.DEC_B},          // 0x05
-		{"LD B, d8", 2, cpu.LD_B_d8},     // 0x06
+		{"NOP", 0, cpu.NOP},                // 0x00
+		{"LD BC, d16", 3, cpu.LD_BC_d16},   // 0x01
+		{"LD (BC), A", 1, cpu.LD_BC_A},     // 0x02
+		{"INC BC", 1, cpu.INC_BC},          // 0x03
+		{"INC B", 1, cpu.INC_B},            // 0x04
+		{"DEC B", 1, cpu.DEC_B},            // 0x05
+		{"LD B, d8", 2, cpu.LD_B_d8},       // 0x06
+		{"RLCA", 1, cpu.RLCA},              // 0x07
+		{"LD (a16), SP", 3, cpu.LD_a16_SP}, // 0x08
+		{"ADD HL, BC", 1, cpu.ADD_HL_BC},   // 0x09
+		{"LD A, (BC)", 1, cpu.LD_A_BC},     // 0x0A
+		{"DEC BC", 1, cpu.DEC_BC},          // 0x0B
+		{"INC C", 1, cpu.INC_C},            // 0x0C
+		{"DEC C", 1, cpu.DEC_C},            // 0x0D
+		{"LD C, d8", 2, cpu.LD_C_d8},       // 0x0E
+		{"RRCA", 1, cpu.RRCA},              // 0x0F
+		{"STOP", 1, cpu.STOP},              // 0x10
+		{"LD DE, d16", 3, cpu.LD_DE_d16},   // 0x11
+		{"LD (DE), A", 1, cpu.LD_DE_A},     // 0x12
+		{"INC DE", 1, cpu.INC_DE},          // 0x13
+		{"INC D", 1, cpu.INC_D},            // 0x14
+		{"DEC D", 1, cpu.DEC_D},            // 0x15
+		{"LD D, d8", 2, cpu.LD_D_d8},       // 0x16
+		{"RLA", 1, cpu.RLA},                // 0x17
+		{"JR r8", 2, cpu.JR_r8},            // 0x18
+		{"ADD HL, DE", 1, cpu.ADD_HL_DE},   // 0x19
+		{"LD A, (DE)", 1, cpu.LD_A_DE},     // 0x1A
+		{"DEC DE", 1, cpu.DEC_DE},          // 0x1B
+		{"INC E", 1, cpu.INC_E},            // 0x1C
+		{"DEC E", 1, cpu.DEC_E},            // 0x1D
+		{"LD E, d8", 2, cpu.LD_E_d8},       // 0x1E
+		{"RRA", 1, cpu.RRA},                // 0x1F
+		{"JR NZ, r8", 2, cpu.JR_NZ_r8},     // 0x20
+		{"LD HL, d16", 3, cpu.LD_HL_d16},   // 0x21
+		{"LD (HL+), A", 1, cpu.LD_HLp_A},   // 0x22
+		{"INC HL", 1, cpu.INC_HL},          // 0x23
+		{"INC H", 1, cpu.INC_H},            // 0x24
+		{"DEC H", 1, cpu.DEC_H},            // 0x25
+
+	}
+}
+
+func (cpu *CPU) CreateTicks(opcode uint8) {
+	cpu.ticksTable = [256]uint8{
+		2, 6, 4, 4, 2, 2, 4, 4, 10, 4, 4, 4, 2, 2, 4, 4, // 0x0_
+		2, 6, 4, 4, 2, 2, 4, 4, 4, 4, 4, 4, 2, 2, 4, 4, // 0x1_
+		0, 6, 4, 4, 2, 2, 4, 2, 0, 4, 4, 4, 2, 2, 4, 2, // 0x2_
+		4, 6, 4, 4, 6, 6, 6, 2, 0, 4, 4, 4, 2, 2, 4, 2, // 0x3_
+		2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2, // 0x4_
+		2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2, // 0x5_
+		2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2, // 0x6_
+		4, 4, 4, 4, 4, 4, 2, 4, 2, 2, 2, 2, 2, 2, 4, 2, // 0x7_
+		2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2, // 0x8_
+		2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2, // 0x9_
+		2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2, // 0xa_
+		2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2, // 0xb_
+		0, 6, 0, 6, 0, 8, 4, 8, 0, 2, 0, 0, 0, 6, 4, 8, // 0xc_
+		0, 6, 0, 0, 0, 8, 4, 8, 0, 8, 0, 0, 0, 0, 4, 8, // 0xd_
+		6, 6, 4, 0, 0, 8, 4, 8, 8, 2, 8, 0, 0, 0, 4, 8, // 0xe_
+		6, 6, 4, 2, 0, 8, 4, 8, 6, 4, 8, 2, 0, 0, 4, 8, // 0xf_
 	}
 }
 
@@ -621,28 +675,56 @@ func (cpu *CPU) CreateTable() {
 func (cpu *CPU) Step() {
 
 	// opcode for a specific instruction
-	var instruction uint8
-	// operand var used in instructions
-	var operand uint16
+	var opcode uint8
 
-	if stopped {
+	if cpu.stopped {
 		return
 	}
 
 	// Use the program counter to read the instruction byte from memory.
-	instruction = cpu.mem.Read8(cpu.regs.pc)
+	opcode = cpu.mem.Read8(cpu.regs.pc)
+
+	// Increment the program counter
+	cpu.regs.pc++
 
 	// Translate the byte to an instruction
+	instruction := cpu.table[opcode]
 
 	// If we can successfully translate the instruction, call our execute method
 	// else panic which now returns the next program counter
 
-	// Set this next program counter on our CPU
+	// check if the instruction is valid/not undefined
+	// if instruction == (Instruction{}) {
+	// 	return
+	// }
+
+	switch instruction.instuctionLength {
+	case 0:
+	case 1:
+		instruction.execute(&OperandInfo{})
+
+	case 2:
+		operand := cpu.mem.Read8(cpu.regs.pc)
+		cpu.regs.pc += uint16(operand)
+		instruction.execute(&OperandInfo{operand8: operand})
+
+	case 3:
+		operand := cpu.mem.Read16(cpu.regs.pc)
+		cpu.regs.pc += operand
+		instruction.execute(&OperandInfo{operand16: operand})
+
+	default:
+		panic("Invalid instruction length")
+	}
+
+	// set ticks using ticks table
+	cpu.ticks += uint32(cpu.ticksTable[opcode])
 
 }
 
 // Reset sets the CPU to a default state
-func (cpu *CPU) Reset() {}
+func (cpu *CPU) Reset() {
+}
 
 var CLOCK_SPEED uint32 = 4194304
 var FRAME_RATE uint32 = 60
