@@ -2,16 +2,7 @@ package gb
 
 // The Gameboy CPU is an 8-bit processor w/ a 16-bit address space.
 
-// <----------------------------- REGISTERS -----------------------------> //
-
-/*
-
-The Gameboy CPU has the following registers:
-
-	- Eight 8-bit registers: A, B, C, D, E, F, H, L
-	- Two 16-bit registers: SP (Stack Pointer), PC (Program Counter)
-
-*/
+// <----------------------------- TYPEDEFS -----------------------------> //
 
 type Registers struct {
 	a  uint8  // Accumulator
@@ -25,6 +16,34 @@ type Registers struct {
 	pc uint16 // Program Counter
 	sp uint16 // Stack Pointer
 }
+
+type OperandInfo struct {
+	operand8  uint8
+	operand16 uint16
+}
+
+type Instruction struct {
+	name             string
+	instuctionLength uint8 // number of bytes for the instruction
+	instruction      func(*OperandInfo)
+}
+
+type CPU struct {
+	regs  Registers
+	mem   Memory
+	table [256]Instruction
+}
+
+// <----------------------------- REGISTERS -----------------------------> //
+
+/*
+
+The Gameboy CPU has the following registers:
+
+	- Eight 8-bit registers: A, B, C, D, E, F, H, L
+	- Two 16-bit registers: SP (Stack Pointer), PC (Program Counter)
+
+*/
 
 /*
 	While the CPU only has 8 bit registers,
@@ -119,11 +138,6 @@ func (r *Registers) SetCarry(value bool) {
 }
 
 // <----------------------------- CPU INSTRUCTIONS -----------------------------> //
-
-type CPU struct {
-	regs Registers
-	mem  Memory
-}
 
 var stopped bool = false
 
@@ -261,44 +275,44 @@ func (cpu *CPU) DEC(value uint8) uint8 {
 // TODO: check all the + and - instructions
 
 // 0x00 - NOP
-func (cpu *CPU) NOP() {}
+func (cpu *CPU) NOP(stepInfo *OperandInfo) {}
 
 // 0x01 - LD BC, d16 (d16 means 16 bit immediate value, operand will be from PC)
-func (cpu *CPU) LD_BC_d16(operand uint16) {
-	cpu.regs.SetBC(operand)
+func (cpu *CPU) LD_BC_d16(stepInfo *OperandInfo) {
+	cpu.regs.SetBC(stepInfo.operand16)
 }
 
 // 0x02 - LD (BC), A
-func (cpu *CPU) LD_BC_A() {
+func (cpu *CPU) LD_BC_A(stepInfo *OperandInfo) {
 	// write at address bc the value of the accumulator
 
 	cpu.mem.Write8(cpu.regs.GetBC(), cpu.regs.a)
 }
 
 // 0x03 - INC BC
-func (cpu *CPU) INC_BC() {
+func (cpu *CPU) INC_BC(stepInfo *OperandInfo) {
 	NN := cpu.regs.GetBC()
 	NN++
 	cpu.regs.SetBC(NN)
 }
 
 // 0x04 - INC B
-func (cpu *CPU) INC_B() {
+func (cpu *CPU) INC_B(stepInfo *OperandInfo) {
 	cpu.regs.b = cpu.INC(cpu.regs.b)
 }
 
 // 0x05 - DEC B
-func (cpu *CPU) DEC_B() {
+func (cpu *CPU) DEC_B(stepInfo *OperandInfo) {
 	cpu.regs.b = cpu.DEC(cpu.regs.b)
 }
 
 // 0x06 - LD B, d8
-func (cpu *CPU) LD_B_d8(operand uint8) {
-	cpu.regs.b = operand
+func (cpu *CPU) LD_B_d8(stepInfo *OperandInfo) {
+	cpu.regs.b = stepInfo.operand8
 }
 
 // 0x07 - RLCA (rotate left through carry)
-func (cpu *CPU) RLCA() {
+func (cpu *CPU) RLCA(stepInfo *OperandInfo) {
 	cpu.regs.a = (cpu.regs.a << 1) | (cpu.regs.a >> 7)
 
 	cpu.regs.SetZero(false)
@@ -311,46 +325,46 @@ func (cpu *CPU) RLCA() {
 }
 
 // 0x08 - LD (a16), SP (?)
-func (cpu *CPU) LD_a16_SP(operand uint16) {
+func (cpu *CPU) LD_a16_SP(stepInfo *OperandInfo) {
 	// write the stack pointer to the address
-	cpu.mem.Write16(operand, cpu.regs.sp)
+	cpu.mem.Write16(stepInfo.operand16, cpu.regs.sp)
 }
 
 // 0x09 - ADD HL, BC
-func (cpu *CPU) ADD_HL_BC() {
+func (cpu *CPU) ADD_HL_BC(stepInfo *OperandInfo) {
 	// TODO: why is this erroring?
 	// cpu.ADD_16(&cpu.regs.GetHL(), cpu.regs.GetBC())
 }
 
 // 0x0A - LD A, (BC)
-func (cpu *CPU) LD_A_BC() {
+func (cpu *CPU) LD_A_BC(stepInfo *OperandInfo) {
 	cpu.regs.a = cpu.mem.Read8(cpu.regs.GetBC())
 }
 
 // 0x0B - DEC BC
-func (cpu *CPU) DEC_BC() {
+func (cpu *CPU) DEC_BC(stepInfo *OperandInfo) {
 	NN := cpu.regs.GetBC()
 	NN--
 	cpu.regs.SetBC(NN)
 }
 
 // 0x0C - INC C
-func (cpu *CPU) INC_C() {
+func (cpu *CPU) INC_C(stepInfo *OperandInfo) {
 	cpu.regs.c = cpu.INC(cpu.regs.c)
 }
 
 // 0x0D - DEC C
-func (cpu *CPU) DEC_C() {
+func (cpu *CPU) DEC_C(stepInfo *OperandInfo) {
 	cpu.regs.c = cpu.DEC(cpu.regs.c)
 }
 
 // 0x0E - LD C, d8
-func (cpu *CPU) LD_C_d8(operand uint8) {
-	cpu.regs.c = operand
+func (cpu *CPU) LD_C_d8(stepInfo *OperandInfo) {
+	cpu.regs.c = stepInfo.operand8
 }
 
 // 0x0F - RRCA (rotate right through carry)
-func (cpu *CPU) RRCA() {
+func (cpu *CPU) RRCA(stepInfo *OperandInfo) {
 	// set the carry flag to bit 0
 	cpu.regs.SetCarry((cpu.regs.a & 0x01) != 0)
 
@@ -363,45 +377,45 @@ func (cpu *CPU) RRCA() {
 }
 
 // 0x10 - STOP
-func (cpu *CPU) STOP() {
-	stopped := true
+func (cpu *CPU) STOP(stepInfo *OperandInfo) {
+	stopped = true
 }
 
 // 0x11 - LD DE, d16 (d16 means 16 bit immediate value, operand will be from PC)
-func (cpu *CPU) LD_DE_d16(operand uint16) {
-	cpu.regs.SetDE(operand)
+func (cpu *CPU) LD_DE_d16(stepInfo *OperandInfo) {
+	cpu.regs.SetDE(stepInfo.operand16)
 }
 
 // 0x12 - LD (DE), A
-func (cpu *CPU) LD_DE_A() {
+func (cpu *CPU) LD_DE_A(stepInfo *OperandInfo) {
 	// write at address bc the value of the accumulator
 	cpu.mem.Write8(cpu.regs.GetDE(), cpu.regs.a)
 }
 
 // 0x13 - INC DE
-func (cpu *CPU) INC_DE() {
+func (cpu *CPU) INC_DE(stepInfo *OperandInfo) {
 	NN := cpu.regs.GetDE()
 	NN++
 	cpu.regs.SetDE(NN)
 }
 
 // 0x14 - INC D
-func (cpu *CPU) INC_D() {
+func (cpu *CPU) INC_D(stepInfo *OperandInfo) {
 	cpu.regs.d = cpu.INC(cpu.regs.d)
 }
 
 // 0x15 - DEC D
-func (cpu *CPU) DEC_D() {
+func (cpu *CPU) DEC_D(stepInfo *OperandInfo) {
 	cpu.regs.d = cpu.DEC(cpu.regs.d)
 }
 
 // 0x16 - LD D, d8
-func (cpu *CPU) LD_D_d8(operand uint8) {
-	cpu.regs.d = operand
+func (cpu *CPU) LD_D_d8(stepInfo *OperandInfo) {
+	cpu.regs.d = stepInfo.operand8
 }
 
 // 0x17 - RLA (rotate left through carry)
-func (cpu *CPU) RLA() {
+func (cpu *CPU) RLA(stepInfo *OperandInfo) {
 
 	// TODO: CHECK THIS
 
@@ -417,12 +431,12 @@ func (cpu *CPU) RLA() {
 }
 
 // 0x18 - JR r8 (r8 means 8 bit immediate value, operand will be from PC)
-func (cpu *CPU) JR_r8(operand uint8) {
-	cpu.regs.pc += uint16(operand)
+func (cpu *CPU) JR_r8(stepInfo *OperandInfo) {
+	cpu.regs.pc += uint16(stepInfo.operand8)
 }
 
 // 0x19 - ADD HL, DE
-func (cpu *CPU) ADD_HL_DE() {
+func (cpu *CPU) ADD_HL_DE(stepInfo *OperandInfo) {
 	// TODO: why is this erroring?
 	// cpu.ADD_16(&cpu.regs.GetHL(), cpu.regs.GetDE())
 }
@@ -430,179 +444,205 @@ func (cpu *CPU) ADD_HL_DE() {
 // cpu.ADD_16(cpu.regs.GetBC(), cpu.regs.GetHL())
 
 // 0x1A - LD A, (DE)
-func (cpu *CPU) LD_A_DE() {
+func (cpu *CPU) LD_A_DE(stepInfo *OperandInfo) {
 	cpu.regs.a = cpu.mem.Read8(cpu.regs.GetDE())
 }
 
 // 0x1B - DEC DE
-func (cpu *CPU) DEC_DE() {
+func (cpu *CPU) DEC_DE(stepInfo *OperandInfo) {
 	NN := cpu.regs.GetDE()
 	NN--
 	cpu.regs.SetDE(NN)
 }
 
 // 0x1C - INC E
-func (cpu *CPU) INC_E() {
+func (cpu *CPU) INC_E(stepInfo *OperandInfo) {
 	cpu.regs.e = cpu.INC(cpu.regs.e)
 }
 
 // 0x1D - DEC E
-func (cpu *CPU) DEC_E() {
+func (cpu *CPU) DEC_E(stepInfo *OperandInfo) {
 	cpu.regs.e = cpu.DEC(cpu.regs.e)
 }
 
 // 0x1E - LD E, d8
-func (cpu *CPU) LD_E_d8(operand uint8) {
-	cpu.regs.e = operand
+func (cpu *CPU) LD_E_d8(stepInfo *OperandInfo) {
+	cpu.regs.e = stepInfo.operand8
 }
 
 // 0x1F - RRA (rotate right through carry)
-func (cpu *CPU) RRA() {
+func (cpu *CPU) RRA(stepInfo *OperandInfo) {
 	// TODO: check this
 }
 
 // 0x20 - JR NZ, r8 (r8 means 8 bit immediate value, operand will be from PC)
-func (cpu *CPU) JR_NZ_r8(operand uint8) {
+func (cpu *CPU) JR_NZ_r8(stepInfo *OperandInfo) {
 	// TODO: check this
 	if cpu.regs.GetZero() == 0 {
-		cpu.regs.pc += uint16(operand)
+		cpu.regs.pc += uint16(stepInfo.operand8)
 	}
 }
 
 // 0x21 - LD HL, d16 (d16 means 16 bit immediate value, operand will be from PC)
-func (cpu *CPU) LD_HL_d16(operand uint16) {
-	cpu.regs.SetHL(operand)
+func (cpu *CPU) LD_HL_d16(stepInfo *OperandInfo) {
+	cpu.regs.SetHL(stepInfo.operand16)
 }
 
 // 0x22 - LD (HL+), A
-func (cpu *CPU) LD_HLp_A() {
+func (cpu *CPU) LD_HLp_A(stepInfo *OperandInfo) {
 	cpu.mem.Write8(cpu.regs.GetHL(), cpu.regs.a)
 }
 
 // 0x23 - INC HL
-func (cpu *CPU) INC_HL() {
+func (cpu *CPU) INC_HL(stepInfo *OperandInfo) {
 	NN := cpu.regs.GetHL()
 	NN++
 	cpu.regs.SetHL(NN)
 }
 
 // 0x24 - INC H
-func (cpu *CPU) INC_H() {
+func (cpu *CPU) INC_H(stepInfo *OperandInfo) {
 	cpu.regs.h = cpu.INC(cpu.regs.h)
 }
 
 // 0x25 - DEC H
-func (cpu *CPU) DEC_H() {
+func (cpu *CPU) DEC_H(stepInfo *OperandInfo) {
 	cpu.regs.h = cpu.DEC(cpu.regs.h)
 }
 
 // 0x26 - LD H, d8
-func (cpu *CPU) LD_H_d8(operand uint8) {
-	cpu.regs.h = operand
+func (cpu *CPU) LD_H_d8(stepInfo *OperandInfo) {
+	cpu.regs.h = stepInfo.operand8
 }
 
 // 0x27 - DAA (decimal adjust accumulator)
-func (cpu *CPU) DAA() {
+func (cpu *CPU) DAA(stepInfo *OperandInfo) {
 	// TODO: this
 
 }
 
 // 0x28 - JR Z, r8
-func (cpu *CPU) JR_Z_r8(operand uint8) {
+func (cpu *CPU) JR_Z_r8(stepInfo *OperandInfo) {
 
 }
 
 // 0x29 - ADD HL, HL
-func (cpu *CPU) ADD_HL_HL() {
+func (cpu *CPU) ADD_HL_HL(stepInfo *OperandInfo) {
 
 }
 
 // 0x2A - LD A, (HL+)
-func (cpu *CPU) LD_A_HLp() {
+func (cpu *CPU) LD_A_HLp(stepInfo *OperandInfo) {
 	cpu.regs.a = cpu.mem.Read8(cpu.regs.GetHL())
 }
 
 // 0x2B - DEC HL
-func (cpu *CPU) DEC_HL() {
+func (cpu *CPU) DEC_HL(stepInfo *OperandInfo) {
 	NN := cpu.regs.GetHL()
 	NN--
 	cpu.regs.SetHL(NN)
 }
 
 // 0x2C - INC L
-func (cpu *CPU) INC_L() {
+func (cpu *CPU) INC_L(stepInfo *OperandInfo) {
 	cpu.regs.l = cpu.INC(cpu.regs.l)
 }
 
 // 0x2D - DEC L
-func (cpu *CPU) DEC_L() {
+func (cpu *CPU) DEC_L(stepInfo *OperandInfo) {
 	cpu.regs.l = cpu.DEC(cpu.regs.l)
 }
 
 // 0x2E - LD L, d8
-func (cpu *CPU) LD_L_d8(operand uint8) {
-	cpu.regs.l = operand
+func (cpu *CPU) LD_L_d8(stepInfo *OperandInfo) {
+	cpu.regs.l = stepInfo.operand8
 }
 
 // 0x2F - CPL (complement accumulator)
-func (cpu *CPU) CPL() {
+func (cpu *CPU) CPL(stepInfo *OperandInfo) {
 	// TODO: this
 }
 
 // 0x30 - JR NC, r8
-func (cpu *CPU) JR_NC_r8(operand uint8) {
+func (cpu *CPU) JR_NC_r8(stepInfo *OperandInfo) {
 	// TODO: this
 }
 
 // 0x31 - LD SP, d16
-func (cpu *CPU) LD_SP_d16(operand uint16) {
-	cpu.regs.sp = operand
+func (cpu *CPU) LD_SP_d16(stepInfo *OperandInfo) {
+	cpu.regs.sp = stepInfo.operand16
 }
 
 // 0x32 - LD (HL-), A
-func (cpu *CPU) LD_HLm_A() {
+func (cpu *CPU) LD_HLm_A(stepInfo *OperandInfo) {
 	// write at address bc the value of the accumulator
 	cpu.mem.Write8(cpu.regs.GetHL(), cpu.regs.a)
 }
 
 // 0x33 - INC SP
-func (cpu *CPU) INC_SP() {
+func (cpu *CPU) INC_SP(stepInfo *OperandInfo) {
 	cpu.regs.sp++
 }
 
 // 0x34 - INC (HL+)
-func (cpu *CPU) INC_HLp() {
+func (cpu *CPU) INC_HLp(stepInfo *OperandInfo) {
 	// set hl to be the increment of the value of the address at hl
 	cpu.mem.Write8(cpu.regs.GetHL(), cpu.INC(cpu.mem.Read8(cpu.regs.GetHL())))
 }
 
 // 0x35 - DEC (HL+)
-func (cpu *CPU) DEC_HLp() {
+func (cpu *CPU) DEC_HLp(stepInfo *OperandInfo) {
 	// set hl to be the decrement of the value of the address at hl
 	cpu.mem.Write8(cpu.regs.GetHL(), cpu.DEC(cpu.mem.Read8(cpu.regs.GetHL())))
 }
 
 // 0x36 - LD (HL+), d8
-func (cpu *CPU) LD_HLp_d8(operand uint8) {
-	cpu.mem.Write8(cpu.regs.GetHL(), operand)
+func (cpu *CPU) LD_HLp_d8(stepInfo *OperandInfo) {
+	cpu.mem.Write8(cpu.regs.GetHL(), stepInfo.operand8)
 }
 
 // 0x37 - SCF (set carry flag)
 
 // <----------------------------- EXECUTION -----------------------------> //
 
+func (cpu *CPU) CreateTable() {
+	cpu.table = [256]Instruction{
+		{"NOP", 0, cpu.NOP},              // 0x00
+		{"LD BC, d16", 3, cpu.LD_BC_d16}, // 0x01
+		{"LD (BC), A", 1, cpu.LD_BC_A},   // 0x02
+		{"INC BC", 1, cpu.INC_BC},        // 0x03
+		{"INC B", 1, cpu.INC_B},          // 0x04
+		{"DEC B", 1, cpu.DEC_B},          // 0x05
+		{"LD B, d8", 2, cpu.LD_B_d8},     // 0x06
+	}
+}
+
 // Step uses the program counter to read an instruction from memory and executes it
-func (cpu *CPU) Step() int {
+func (cpu *CPU) Step() {
+
+	// opcode for a specific instruction
+	var instruction uint8
+	// operand var used in instructions
+	var operand uint16
+
+	if stopped {
+		return
+	}
+
 	// Use the program counter to read the instruction byte from memory.
+	instruction = cpu.mem.Read8(cpu.regs.pc)
 
-	// Translate the byte to one of the instances of the Instruction enum
+	// Translate the byte to an instruction
 
-	// If we can successfully translate the instruction call our execute method else panic which now returns the next program counter
+	// If we can successfully translate the instruction, call our execute method
+	// else panic which now returns the next program counter
 
 	// Set this next program counter on our CPU
 
-	return 0
 }
+
+// Reset sets the CPU to a default state
+func (cpu *CPU) Reset() {}
 
 var CLOCK_SPEED uint32 = 4194304
 var FRAME_RATE uint32 = 60
