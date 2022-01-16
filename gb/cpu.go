@@ -603,6 +603,67 @@ func (cpu *CPU) LD_HLp_d8(stepInfo *OperandInfo) {
 }
 
 // 0x37 - SCF (set carry flag)
+func (cpu *CPU) SCF(stepInfo *OperandInfo) {
+	cpu.regs.SetCarry(true)
+	cpu.regs.SetZero(false)
+	cpu.regs.SetHalfCarry(false)
+}
+
+// 0x38 - JR C, r8
+func (cpu *CPU) JR_C_r8(stepInfo *OperandInfo) {
+	// TODO: this
+}
+
+// 0x39 - ADD HL, SP
+func (cpu *CPU) ADD_HL_SP(stepInfo *OperandInfo) {
+	// TODO: use add functions?
+}
+
+// 0x3A - LD A, (HL-)
+func (cpu *CPU) LD_A_HLm(stepInfo *OperandInfo) {
+	cpu.regs.a = cpu.mem.Read8(cpu.regs.GetHL())
+}
+
+// 0x3B - DEC SP
+func (cpu *CPU) DEC_SP(stepInfo *OperandInfo) {
+	cpu.regs.sp--
+}
+
+// 0x3C - INC A
+func (cpu *CPU) INC_A(stepInfo *OperandInfo) {
+	cpu.regs.a = cpu.INC(cpu.regs.a)
+}
+
+// 0x3D - DEC A
+func (cpu *CPU) DEC_A(stepInfo *OperandInfo) {
+	cpu.regs.a = cpu.DEC(cpu.regs.a)
+}
+
+// 0x3E - LD A, d8
+func (cpu *CPU) LD_A_d8(stepInfo *OperandInfo) {
+	cpu.regs.a = stepInfo.operand8
+}
+
+// 0x3F - CCF (complement carry flag)
+func (cpu *CPU) CCF(stepInfo *OperandInfo) {
+
+	// TODO: ??
+}
+
+// 0x40 - LD B, B
+func (cpu *CPU) LD_B_B(stepInfo *OperandInfo) {
+	// NOP
+}
+
+// 0x41 - LD B, C
+func (cpu *CPU) LD_B_C(stepInfo *OperandInfo) {
+	cpu.regs.b = cpu.regs.c
+}
+
+// 0x42 - LD B, D
+func (cpu *CPU) LD_B_D(stepInfo *OperandInfo) {
+	cpu.regs.b = cpu.regs.d
+}
 
 // <----------------------------- EXECUTION -----------------------------> //
 
@@ -646,6 +707,23 @@ func (cpu *CPU) CreateTable() {
 		{"INC HL", 1, cpu.INC_HL},          // 0x23
 		{"INC H", 1, cpu.INC_H},            // 0x24
 		{"DEC H", 1, cpu.DEC_H},            // 0x25
+		{"LD H, d8", 2, cpu.LD_H_d8},       // 0x26
+		{"DAA", 1, cpu.DAA},                // 0x27
+		{"JR Z, r8", 2, cpu.JR_Z_r8},       // 0x28
+		{"ADD HL, HL", 1, cpu.ADD_HL_HL},   // 0x29
+		{"LD A, (HL+)", 1, cpu.LD_A_HLp},   // 0x2A
+		{"DEC HL", 1, cpu.DEC_HL},          // 0x2B
+		{"INC L", 1, cpu.INC_L},            // 0x2C
+		{"DEC L", 1, cpu.DEC_L},            // 0x2D
+		{"LD L, d8", 2, cpu.LD_L_d8},       // 0x2E
+		{"CPL", 1, cpu.CPL},                // 0x2F
+		{"JR NC, r8", 2, cpu.JR_NC_r8},     // 0x30
+		{"LD SP, d16", 3, cpu.LD_SP_d16},   // 0x31
+		{"LD (HL-), A", 1, cpu.LD_HLm_A},   // 0x32
+		{"INC SP", 1, cpu.INC_SP},          // 0x33
+		{"INC (HL+)", 1, cpu.INC_HLp},      // 0x34
+		{"DEC (HL)", 1, cpu.DEC_HLp},       // 0x35
+		{"LD (HL), d8", 2, cpu.LD_HLp_d8},  // 0x36
 
 	}
 }
