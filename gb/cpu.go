@@ -665,6 +665,156 @@ func (cpu *CPU) LD_B_D(stepInfo *OperandInfo) {
 	cpu.regs.b = cpu.regs.d
 }
 
+// 0x43 - LD B, E
+func (cpu *CPU) LD_B_E(stepInfo *OperandInfo) {
+	cpu.regs.b = cpu.regs.e
+}
+
+// 0x44 - LD B, H
+func (cpu *CPU) LD_B_H(stepInfo *OperandInfo) {
+	cpu.regs.b = cpu.regs.h
+}
+
+// 0x45 - LD B, L
+func (cpu *CPU) LD_B_L(stepInfo *OperandInfo) {
+	cpu.regs.b = cpu.regs.l
+}
+
+// 0x46 - LD B, (HL+)
+func (cpu *CPU) LD_B_HLp(stepInfo *OperandInfo) {
+	cpu.regs.b = cpu.mem.Read8(cpu.regs.GetHL())
+}
+
+// 0x47 - LD B, A
+func (cpu *CPU) LD_B_A(stepInfo *OperandInfo) {
+	cpu.regs.b = cpu.regs.a
+}
+
+// 0x48 - LD C, B
+func (cpu *CPU) LD_C_B(stepInfo *OperandInfo) {
+	cpu.regs.c = cpu.regs.b
+}
+
+// 0x49 - LD C, C
+func (cpu *CPU) LD_C_C(stepInfo *OperandInfo) {
+	// NOP
+}
+
+// 0x4A - LD C, D
+func (cpu *CPU) LD_C_D(stepInfo *OperandInfo) {
+	cpu.regs.c = cpu.regs.d
+}
+
+// 0x4B - LD C, E
+func (cpu *CPU) LD_C_E(stepInfo *OperandInfo) {
+	cpu.regs.c = cpu.regs.e
+}
+
+// 0x4C - LD C, H
+func (cpu *CPU) LD_C_H(stepInfo *OperandInfo) {
+	cpu.regs.c = cpu.regs.h
+}
+
+// 0x4D - LD C, L
+func (cpu *CPU) LD_C_L(stepInfo *OperandInfo) {
+	cpu.regs.c = cpu.regs.l
+}
+
+// 0x4E - LD C, (HL+)
+func (cpu *CPU) LD_C_HLp(stepInfo *OperandInfo) {
+	cpu.regs.c = cpu.mem.Read8(cpu.regs.GetHL())
+}
+
+// 0x4F - LD C, A
+func (cpu *CPU) LD_C_A(stepInfo *OperandInfo) {
+	cpu.regs.c = cpu.regs.a
+}
+
+// 0x50 - LD D, B
+func (cpu *CPU) LD_D_B(stepInfo *OperandInfo) {
+	cpu.regs.d = cpu.regs.b
+}
+
+// 0x51 - LD D, C
+func (cpu *CPU) LD_D_C(stepInfo *OperandInfo) {
+	cpu.regs.d = cpu.regs.c
+}
+
+// 0x52 - LD D, D
+func (cpu *CPU) LD_D_D(stepInfo *OperandInfo) {
+	// NOP
+}
+
+// 0x53 - LD D, E
+func (cpu *CPU) LD_D_E(stepInfo *OperandInfo) {
+	cpu.regs.d = cpu.regs.e
+}
+
+// 0x54 - LD D, H
+func (cpu *CPU) LD_D_H(stepInfo *OperandInfo) {
+	cpu.regs.d = cpu.regs.h
+}
+
+// 0x55 - LD D, L
+func (cpu *CPU) LD_D_L(stepInfo *OperandInfo) {
+	cpu.regs.d = cpu.regs.l
+}
+
+// 0x56 - LD D, (HL+)
+func (cpu *CPU) LD_D_HLp(stepInfo *OperandInfo) {
+	cpu.regs.d = cpu.mem.Read8(cpu.regs.GetHL())
+}
+
+// 0x57 - LD D, A
+func (cpu *CPU) LD_D_A(stepInfo *OperandInfo) {
+	cpu.regs.d = cpu.regs.a
+}
+
+// 0x58 - LD E, B
+func (cpu *CPU) LD_E_B(stepInfo *OperandInfo) {
+	cpu.regs.e = cpu.regs.b
+}
+
+// 0x59 - LD E, C
+func (cpu *CPU) LD_E_C(stepInfo *OperandInfo) {
+	cpu.regs.e = cpu.regs.c
+}
+
+// 0x5A - LD E, D
+func (cpu *CPU) LD_E_D(stepInfo *OperandInfo) {
+	cpu.regs.e = cpu.regs.d
+}
+
+// 0x5B - LD E, E
+func (cpu *CPU) LD_E_E(stepInfo *OperandInfo) {
+	// NOP
+}
+
+// 0x5C - LD E, H
+func (cpu *CPU) LD_E_H(stepInfo *OperandInfo) {
+	cpu.regs.e = cpu.regs.h
+}
+
+// 0x5D - LD E, L
+func (cpu *CPU) LD_E_L(stepInfo *OperandInfo) {
+	cpu.regs.e = cpu.regs.l
+}
+
+// 0x5E - LD E, (HL+)
+func (cpu *CPU) LD_E_HLp(stepInfo *OperandInfo) {
+	cpu.regs.e = cpu.mem.Read8(cpu.regs.GetHL())
+}
+
+// 0x5F - LD E, A
+func (cpu *CPU) LD_E_A(stepInfo *OperandInfo) {
+	cpu.regs.e = cpu.regs.a
+}
+
+// 0x60 - LD H, B
+func (cpu *CPU) LD_H_B(stepInfo *OperandInfo) {
+	cpu.regs.h = cpu.regs.b
+}
+
 // <----------------------------- EXECUTION -----------------------------> //
 
 func (cpu *CPU) CreateTable() {
@@ -724,6 +874,48 @@ func (cpu *CPU) CreateTable() {
 		{"INC (HL+)", 1, cpu.INC_HLp},      // 0x34
 		{"DEC (HL)", 1, cpu.DEC_HLp},       // 0x35
 		{"LD (HL), d8", 2, cpu.LD_HLp_d8},  // 0x36
+		{"SCF", 1, cpu.SCF},                // 0x37
+		{"JR C, r8", 2, cpu.JR_C_r8},       // 0x38
+		{"ADD HL, SP", 1, cpu.ADD_HL_SP},   // 0x39
+		{"LD A, (HL-)", 1, cpu.LD_A_HLm},   // 0x3A
+		{"DEC SP", 1, cpu.DEC_SP},          // 0x3B
+		{"INC A", 1, cpu.INC_A},            // 0x3C
+		{"DEC A", 1, cpu.DEC_A},            // 0x3D
+		{"LD A, d8", 2, cpu.LD_A_d8},       // 0x3E
+		{"CCF", 1, cpu.CCF},                // 0x3F
+		{"LD B, B", 1, cpu.LD_B_B},         // 0x40
+		{"LD B, C", 1, cpu.LD_B_C},         // 0x41
+		{"LD B, D", 1, cpu.LD_B_D},         // 0x42
+		{"LD B, E", 1, cpu.LD_B_E},         // 0x43
+		{"LD B, H", 1, cpu.LD_B_H},         // 0x44
+		{"LD B, L", 1, cpu.LD_B_L},         // 0x45
+		{"LD B, (HL+)", 1, cpu.LD_B_HLp},   // 0x46
+		{"LD B, A", 1, cpu.LD_B_A},         // 0x47
+		{"LD C, B", 1, cpu.LD_C_B},         // 0x48
+		{"LD C, C", 1, cpu.LD_C_C},         // 0x49
+		{"LD C, D", 1, cpu.LD_C_D},         // 0x4A
+		{"LD C, E", 1, cpu.LD_C_E},         // 0x4B
+		{"LD C, H", 1, cpu.LD_C_H},         // 0x4C
+		{"LD C, L", 1, cpu.LD_C_L},         // 0x4D
+		{"LD C, (HL+)", 1, cpu.LD_C_HLp},   // 0x4E
+		{"LD C, A", 1, cpu.LD_C_A},         // 0x4F
+		{"LD D, B", 1, cpu.LD_D_B},         // 0x50
+		{"LD D, C", 1, cpu.LD_D_C},         // 0x51
+		{"LD D, D", 1, cpu.LD_D_D},         // 0x52
+		{"LD D, E", 1, cpu.LD_D_E},         // 0x53
+		{"LD D, H", 1, cpu.LD_D_H},         // 0x54
+		{"LD D, L", 1, cpu.LD_D_L},         // 0x55
+		{"LD D, (HL+)", 1, cpu.LD_D_HLp},   // 0x56
+		{"LD D, A", 1, cpu.LD_D_A},         // 0x57
+		{"LD E, B", 1, cpu.LD_E_B},         // 0x58
+		{"LD E, C", 1, cpu.LD_E_C},         // 0x59
+		{"LD E, D", 1, cpu.LD_E_D},         // 0x5A
+		{"LD E, E", 1, cpu.LD_E_E},         // 0x5B
+		{"LD E, H", 1, cpu.LD_E_H},         // 0x5C
+		{"LD E, L", 1, cpu.LD_E_L},         // 0x5D
+		{"LD E, (HL+)", 1, cpu.LD_E_HLp},   // 0x5E
+		{"LD E, A", 1, cpu.LD_E_A},         // 0x5F
+		{"LD H, B", 1, cpu.LD_H_B},         // 0x60
 
 	}
 }
@@ -802,6 +994,20 @@ func (cpu *CPU) Step() {
 
 // Reset sets the CPU to a default state
 func (cpu *CPU) Reset() {
+
+	// TODO: create set af register function for this
+	// cpu.regs.af = 0x01B0
+
+	cpu.regs.SetBC(0x0013)
+	cpu.regs.SetDE(0x00D8)
+	cpu.regs.SetHL(0x014D)
+
+	cpu.regs.sp = 0xFFFE
+	cpu.regs.pc = 0x0100
+
+	cpu.stopped = false
+	cpu.ticks = 0
+
 }
 
 var CLOCK_SPEED uint32 = 4194304
