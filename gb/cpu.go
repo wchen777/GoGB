@@ -1,5 +1,9 @@
 package gb
 
+import (
+	"fmt"
+)
+
 // The Gameboy CPU is an 8-bit processor w/ a 16-bit address space.
 
 // <----------------------------- TYPEDEFS -----------------------------> //
@@ -650,7 +654,6 @@ func (cpu *CPU) LD_A_d8(stepInfo *OperandInfo) {
 
 // 0x3F - CCF (complement carry flag)
 func (cpu *CPU) CCF(stepInfo *OperandInfo) {
-
 	// TODO: ??
 }
 
@@ -934,6 +937,350 @@ func (cpu *CPU) HALT(stepInfo *OperandInfo) {
 // 0x77 - LD (HL+), A
 func (cpu *CPU) LD_HL_A(stepInfo *OperandInfo) {
 	cpu.mem.Write8(cpu.regs.GetHL(), cpu.regs.a)
+}
+
+// 0x78 - LD A, B
+func (cpu *CPU) LD_A_B(stepInfo *OperandInfo) {
+	cpu.regs.a = cpu.regs.b
+}
+
+// 0x79 - LD A, C
+func (cpu *CPU) LD_A_C(stepInfo *OperandInfo) {
+	cpu.regs.a = cpu.regs.c
+}
+
+// 0x7A - LD A, D
+func (cpu *CPU) LD_A_D(stepInfo *OperandInfo) {
+	cpu.regs.a = cpu.regs.d
+}
+
+// 0x7B - LD A, E
+func (cpu *CPU) LD_A_E(stepInfo *OperandInfo) {
+	cpu.regs.a = cpu.regs.e
+}
+
+// 0x7C - LD A, H
+func (cpu *CPU) LD_A_H(stepInfo *OperandInfo) {
+	cpu.regs.a = cpu.regs.h
+}
+
+// 0x7D - LD A, L
+func (cpu *CPU) LD_A_L(stepInfo *OperandInfo) {
+	cpu.regs.a = cpu.regs.l
+}
+
+// 0x7E - LD A, (HL+)
+func (cpu *CPU) LD_A_HLp(stepInfo *OperandInfo) {
+	cpu.regs.a = cpu.mem.Read8(cpu.regs.GetHL())
+}
+
+// 0x7F - LD A, A
+func (cpu *CPU) LD_A_A(stepInfo *OperandInfo) {
+	// NOP
+}
+
+// 0x80 - ADD A, B
+func (cpu *CPU) ADD_A_B(stepInfo *OperandInfo) {
+	cpu.ADD(&cpu.regs.a, cpu.regs.b)
+}
+
+// 0x81 - ADD A, C
+func (cpu *CPU) ADD_A_C(stepInfo *OperandInfo) {
+	cpu.ADD(&cpu.regs.a, cpu.regs.c)
+}
+
+// 0x82 - ADD A, D
+func (cpu *CPU) ADD_A_D(stepInfo *OperandInfo) {
+	cpu.ADD(&cpu.regs.a, cpu.regs.d)
+}
+
+// 0x83 - ADD A, E
+func (cpu *CPU) ADD_A_E(stepInfo *OperandInfo) {
+	cpu.ADD(&cpu.regs.a, cpu.regs.e)
+}
+
+// 0x84 - ADD A, H
+func (cpu *CPU) ADD_A_H(stepInfo *OperandInfo) {
+	cpu.ADD(&cpu.regs.a, cpu.regs.h)
+}
+
+// 0x85 - ADD A, L
+func (cpu *CPU) ADD_A_L(stepInfo *OperandInfo) {
+	cpu.ADD(&cpu.regs.a, cpu.regs.l)
+}
+
+// 0x86 - ADD A, (HL+)
+func (cpu *CPU) ADD_A_HLp(stepInfo *OperandInfo) {
+	cpu.ADD(&cpu.regs.a, cpu.mem.Read8(cpu.regs.GetHL()))
+}
+
+// 0x87 - ADD A, A
+func (cpu *CPU) ADD_A_A(stepInfo *OperandInfo) {
+	cpu.ADD(&cpu.regs.a, cpu.regs.a)
+}
+
+// 0x88 - ADC A, B
+func (cpu *CPU) ADC_A_B(stepInfo *OperandInfo) {
+	cpu.ADC(cpu.regs.b)
+}
+
+// 0x89 - ADC A, C
+func (cpu *CPU) ADC_A_C(stepInfo *OperandInfo) {
+	cpu.ADC(cpu.regs.c)
+}
+
+// 0x8A - ADC A, D
+func (cpu *CPU) ADC_A_D(stepInfo *OperandInfo) {
+	cpu.ADC(cpu.regs.d)
+}
+
+// 0x8B - ADC A, E
+func (cpu *CPU) ADC_A_E(stepInfo *OperandInfo) {
+	cpu.ADC(cpu.regs.e)
+}
+
+// 0x8C - ADC A, H
+func (cpu *CPU) ADC_A_H(stepInfo *OperandInfo) {
+	cpu.ADC(cpu.regs.h)
+}
+
+// 0x8D - ADC A, L
+func (cpu *CPU) ADC_A_L(stepInfo *OperandInfo) {
+	cpu.ADC(cpu.regs.l)
+}
+
+// 0x8E - ADC A, (HL+)
+func (cpu *CPU) ADC_A_HLp(stepInfo *OperandInfo) {
+	cpu.ADC(cpu.mem.Read8(cpu.regs.GetHL()))
+}
+
+// 0x8F - ADC A, A
+func (cpu *CPU) ADC_A_A(stepInfo *OperandInfo) {
+	cpu.ADC(cpu.regs.a)
+}
+
+// 0x90 - SUB B
+func (cpu *CPU) SUB_B(stepInfo *OperandInfo) {
+	cpu.SUB(cpu.regs.b)
+}
+
+// 0x91 - SUB C
+func (cpu *CPU) SUB_C(stepInfo *OperandInfo) {
+	cpu.SUB(cpu.regs.c)
+}
+
+// 0x92 - SUB D
+func (cpu *CPU) SUB_D(stepInfo *OperandInfo) {
+	cpu.SUB(cpu.regs.d)
+}
+
+// 0x93 - SUB E
+func (cpu *CPU) SUB_E(stepInfo *OperandInfo) {
+	cpu.SUB(cpu.regs.e)
+}
+
+// 0x94 - SUB H
+func (cpu *CPU) SUB_H(stepInfo *OperandInfo) {
+	cpu.SUB(cpu.regs.h)
+}
+
+// 0x95 - SUB L
+func (cpu *CPU) SUB_L(stepInfo *OperandInfo) {
+	cpu.SUB(cpu.regs.l)
+}
+
+// 0x96 - SUB (HL+)
+func (cpu *CPU) SUB_HLp(stepInfo *OperandInfo) {
+	cpu.SUB(cpu.mem.Read8(cpu.regs.GetHL()))
+}
+
+// 0x97 - SUB A
+func (cpu *CPU) SUB_A(stepInfo *OperandInfo) {
+	cpu.SUB(cpu.regs.a)
+}
+
+// 0x98 - SBC A, B
+func (cpu *CPU) SBC_A_B(stepInfo *OperandInfo) {
+	cpu.SBC(cpu.regs.b)
+}
+
+// 0x99 - SBC A, C
+func (cpu *CPU) SBC_A_C(stepInfo *OperandInfo) {
+	cpu.SBC(cpu.regs.c)
+}
+
+// 0x9A - SBC A, D
+func (cpu *CPU) SBC_A_D(stepInfo *OperandInfo) {
+	cpu.SBC(cpu.regs.d)
+}
+
+// 0x9B - SBC A, E
+func (cpu *CPU) SBC_A_E(stepInfo *OperandInfo) {
+	cpu.SBC(cpu.regs.e)
+}
+
+// 0x9C - SBC A, H
+func (cpu *CPU) SBC_A_H(stepInfo *OperandInfo) {
+	cpu.SBC(cpu.regs.h)
+}
+
+// 0x9D - SBC A, L
+func (cpu *CPU) SBC_A_L(stepInfo *OperandInfo) {
+	cpu.SBC(cpu.regs.l)
+}
+
+// 0x9E - SBC A, (HL+)
+func (cpu *CPU) SBC_A_HLp(stepInfo *OperandInfo) {
+	cpu.SBC(cpu.mem.Read8(cpu.regs.GetHL()))
+}
+
+// 0x9F - SBC A, A
+func (cpu *CPU) SBC_A_A(stepInfo *OperandInfo) {
+	cpu.SBC(cpu.regs.a)
+}
+
+// 0xA0 - AND B
+func (cpu *CPU) AND_B(stepInfo *OperandInfo) {
+	cpu.AND(cpu.regs.b)
+}
+
+// 0xA1 - AND C
+func (cpu *CPU) AND_C(stepInfo *OperandInfo) {
+	cpu.AND(cpu.regs.c)
+}
+
+// 0xA2 - AND D
+func (cpu *CPU) AND_D(stepInfo *OperandInfo) {
+	cpu.AND(cpu.regs.d)
+}
+
+// 0xA3 - AND E
+func (cpu *CPU) AND_E(stepInfo *OperandInfo) {
+	cpu.AND(cpu.regs.e)
+}
+
+// 0xA4 - AND H
+func (cpu *CPU) AND_H(stepInfo *OperandInfo) {
+	cpu.AND(cpu.regs.h)
+}
+
+// 0xA5 - AND L
+func (cpu *CPU) AND_L(stepInfo *OperandInfo) {
+	cpu.AND(cpu.regs.l)
+}
+
+// 0xA6 - AND (HL+)
+func (cpu *CPU) AND_HLp(stepInfo *OperandInfo) {
+	cpu.AND(cpu.mem.Read8(cpu.regs.GetHL()))
+}
+
+// 0xA7 - AND A
+func (cpu *CPU) AND_A(stepInfo *OperandInfo) {
+	cpu.AND(cpu.regs.a)
+}
+
+// 0xA8 - XOR B
+func (cpu *CPU) XOR_B(stepInfo *OperandInfo) {
+	cpu.XOR(cpu.regs.b)
+}
+
+// 0xA9 - XOR C
+func (cpu *CPU) XOR_C(stepInfo *OperandInfo) {
+	cpu.XOR(cpu.regs.c)
+}
+
+// 0xAA - XOR D
+func (cpu *CPU) XOR_D(stepInfo *OperandInfo) {
+	cpu.XOR(cpu.regs.d)
+}
+
+// 0xAB - XOR E
+func (cpu *CPU) XOR_E(stepInfo *OperandInfo) {
+	cpu.XOR(cpu.regs.e)
+}
+
+// 0xAC - XOR H
+func (cpu *CPU) XOR_H(stepInfo *OperandInfo) {
+	cpu.XOR(cpu.regs.h)
+}
+
+// 0xAD - XOR L
+func (cpu *CPU) XOR_L(stepInfo *OperandInfo) {
+	cpu.XOR(cpu.regs.l)
+}
+
+// 0xAE - XOR (HL+)
+func (cpu *CPU) XOR_HLp(stepInfo *OperandInfo) {
+	cpu.XOR(cpu.mem.Read8(cpu.regs.GetHL()))
+}
+
+// 0xAF - XOR A
+func (cpu *CPU) XOR_A(stepInfo *OperandInfo) {
+	cpu.XOR(cpu.regs.a)
+}
+
+// 0xB0 - OR B
+func (cpu *CPU) OR_B(stepInfo *OperandInfo) {
+	cpu.OR(cpu.regs.b)
+}
+
+// 0xB1 - OR C
+func (cpu *CPU) OR_C(stepInfo *OperandInfo) {
+	cpu.OR(cpu.regs.c)
+}
+
+// 0xB2 - OR D
+func (cpu *CPU) OR_D(stepInfo *OperandInfo) {
+	cpu.OR(cpu.regs.d)
+}
+
+// 0xB3 - OR E
+func (cpu *CPU) OR_E(stepInfo *OperandInfo) {
+	cpu.OR(cpu.regs.e)
+}
+
+// 0xB4 - OR H
+func (cpu *CPU) OR_H(stepInfo *OperandInfo) {
+	cpu.OR(cpu.regs.h)
+}
+
+// 0xB5 - OR L
+func (cpu *CPU) OR_L(stepInfo *OperandInfo) {
+	cpu.OR(cpu.regs.l)
+}
+
+// 0xB6 - OR (HL+)
+func (cpu *CPU) OR_HLp(stepInfo *OperandInfo) {
+	cpu.OR(cpu.mem.Read8(cpu.regs.GetHL()))
+}
+
+// 0xB7 - OR A
+func (cpu *CPU) OR_A(stepInfo *OperandInfo) {
+	cpu.OR(cpu.regs.a)
+}
+
+// 0xB8 - CP B
+func (cpu *CPU) CP_B(stepInfo *OperandInfo) {
+	cpu.CP(cpu.regs.b)
+}
+
+// 0xB9 - CP C
+func (cpu *CPU) CP_C(stepInfo *OperandInfo) {
+	cpu.CP(cpu.regs.c)
+}
+
+// 0xBA - CP D
+func (cpu *CPU) CP_D(stepInfo *OperandInfo) {
+	cpu.CP(cpu.regs.d)
+}
+
+// 0xBB - CP E
+func (cpu *CPU) CP_E(stepInfo *OperandInfo) {
+	cpu.CP(cpu.regs.e)
+}
+
+func (cpu *CPU) UNKNOWN(stepInfo *OperandInfo) {
+	fmt.Printf("Unknown opcode!")
 }
 
 // <----------------------------- EXECUTION -----------------------------> //
