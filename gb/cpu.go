@@ -490,8 +490,9 @@ func (cpu *CPU) LD_HL_d16(stepInfo *OperandInfo) {
 }
 
 // 0x22 - LD (HL+), A
-func (cpu *CPU) LD_HLp_A(stepInfo *OperandInfo) {
+func (cpu *CPU) LDi_HLp_A(stepInfo *OperandInfo) {
 	cpu.mem.Write8(cpu.regs.GetHL(), cpu.regs.a)
+	cpu.regs.SetHL(cpu.regs.GetHL() + 1)
 }
 
 // 0x23 - INC HL
@@ -533,8 +534,9 @@ func (cpu *CPU) ADD_HL_HL(stepInfo *OperandInfo) {
 }
 
 // 0x2A - LD A, (HL+)
-func (cpu *CPU) LD_A_HLp(stepInfo *OperandInfo) {
+func (cpu *CPU) LDi_A_HLp(stepInfo *OperandInfo) {
 	cpu.regs.a = cpu.mem.Read8(cpu.regs.GetHL())
+	cpu.regs.SetHL(cpu.regs.GetHL() + 1)
 }
 
 // 0x2B - DEC HL
@@ -578,6 +580,7 @@ func (cpu *CPU) LD_SP_d16(stepInfo *OperandInfo) {
 func (cpu *CPU) LD_HLm_A(stepInfo *OperandInfo) {
 	// write at address bc the value of the accumulator
 	cpu.mem.Write8(cpu.regs.GetHL(), cpu.regs.a)
+	cpu.regs.SetHL(cpu.regs.GetHL() - 1)
 }
 
 // 0x33 - INC SP
@@ -622,6 +625,7 @@ func (cpu *CPU) ADD_HL_SP(stepInfo *OperandInfo) {
 // 0x3A - LD A, (HL-)
 func (cpu *CPU) LD_A_HLm(stepInfo *OperandInfo) {
 	cpu.regs.a = cpu.mem.Read8(cpu.regs.GetHL())
+	cpu.regs.SetHL(cpu.regs.GetHL() - 1)
 }
 
 // 0x3B - DEC SP
@@ -815,6 +819,123 @@ func (cpu *CPU) LD_H_B(stepInfo *OperandInfo) {
 	cpu.regs.h = cpu.regs.b
 }
 
+// 0x61 - LD H, C
+func (cpu *CPU) LD_H_C(stepInfo *OperandInfo) {
+	cpu.regs.h = cpu.regs.c
+}
+
+// 0x62 - LD H, D
+func (cpu *CPU) LD_H_D(stepInfo *OperandInfo) {
+	cpu.regs.h = cpu.regs.d
+}
+
+// 0x63 - LD H, E
+func (cpu *CPU) LD_H_E(stepInfo *OperandInfo) {
+	cpu.regs.h = cpu.regs.e
+}
+
+// 0x64 - LD H, H
+func (cpu *CPU) LD_H_H(stepInfo *OperandInfo) {
+	// NOP
+}
+
+// 0x65 - LD H, L
+func (cpu *CPU) LD_H_L(stepInfo *OperandInfo) {
+	cpu.regs.h = cpu.regs.l
+}
+
+// 0x66 - LD H, (HL+)
+func (cpu *CPU) LD_H_HLp(stepInfo *OperandInfo) {
+	cpu.regs.h = cpu.mem.Read8(cpu.regs.GetHL())
+}
+
+// 0x67 - LD H, A
+func (cpu *CPU) LD_H_A(stepInfo *OperandInfo) {
+	cpu.regs.h = cpu.regs.a
+}
+
+// 0x68 - LD L, B
+func (cpu *CPU) LD_L_B(stepInfo *OperandInfo) {
+	cpu.regs.l = cpu.regs.b
+}
+
+// 0x69 - LD L, C
+func (cpu *CPU) LD_L_C(stepInfo *OperandInfo) {
+	cpu.regs.l = cpu.regs.c
+}
+
+// 0x6A - LD L, D
+func (cpu *CPU) LD_L_D(stepInfo *OperandInfo) {
+	cpu.regs.l = cpu.regs.d
+}
+
+// 0x6B - LD L, E
+func (cpu *CPU) LD_L_E(stepInfo *OperandInfo) {
+	cpu.regs.l = cpu.regs.e
+}
+
+// 0x6C - LD L, H
+func (cpu *CPU) LD_L_H(stepInfo *OperandInfo) {
+	cpu.regs.l = cpu.regs.h
+}
+
+// 0x6D - LD L, L
+func (cpu *CPU) LD_L_L(stepInfo *OperandInfo) {
+	// NOP
+}
+
+// 0x6E - LD L, (HL+)
+func (cpu *CPU) LD_L_HLp(stepInfo *OperandInfo) {
+	cpu.regs.l = cpu.mem.Read8(cpu.regs.GetHL())
+}
+
+// 0x6F - LD L, A
+func (cpu *CPU) LD_L_A(stepInfo *OperandInfo) {
+	cpu.regs.l = cpu.regs.a
+}
+
+// 0x70 - LD (HL+), B
+func (cpu *CPU) LD_HLp_B(stepInfo *OperandInfo) {
+	cpu.mem.Write8(cpu.regs.GetHL(), cpu.regs.b)
+}
+
+// 0x71 - LD (HL+), C
+func (cpu *CPU) LD_HLp_C(stepInfo *OperandInfo) {
+	cpu.mem.Write8(cpu.regs.GetHL(), cpu.regs.c)
+}
+
+// 0x72 - LD (HL+), D
+func (cpu *CPU) LD_HLp_D(stepInfo *OperandInfo) {
+	cpu.mem.Write8(cpu.regs.GetHL(), cpu.regs.d)
+}
+
+// 0x73 - LD (HL+), E
+func (cpu *CPU) LD_HLp_E(stepInfo *OperandInfo) {
+	cpu.mem.Write8(cpu.regs.GetHL(), cpu.regs.e)
+}
+
+// 0x74 - LD (HL+), H
+func (cpu *CPU) LD_HLp_H(stepInfo *OperandInfo) {
+	cpu.mem.Write8(cpu.regs.GetHL(), cpu.regs.h)
+}
+
+// 0x75 - LD (HL+), L
+func (cpu *CPU) LD_HLp_L(stepInfo *OperandInfo) {
+	cpu.mem.Write8(cpu.regs.GetHL(), cpu.regs.l)
+}
+
+// 0x76 - HALT
+func (cpu *CPU) HALT(stepInfo *OperandInfo) {
+	// TODO: this
+	// halt execution until an interrupt occurs, use interrupt information to determine if an interrupt is pending
+	// else increment pc
+}
+
+// 0x77 - LD (HL+), A
+func (cpu *CPU) LD_HL_A(stepInfo *OperandInfo) {
+	cpu.mem.Write8(cpu.regs.GetHL(), cpu.regs.a)
+}
+
 // <----------------------------- EXECUTION -----------------------------> //
 
 func (cpu *CPU) CreateTable() {
@@ -853,7 +974,7 @@ func (cpu *CPU) CreateTable() {
 		{"RRA", 1, cpu.RRA},                // 0x1F
 		{"JR NZ, r8", 2, cpu.JR_NZ_r8},     // 0x20
 		{"LD HL, d16", 3, cpu.LD_HL_d16},   // 0x21
-		{"LD (HL+), A", 1, cpu.LD_HLp_A},   // 0x22
+		{"LD (HL+), A", 1, cpu.LDi_HLp_A},  // 0x22
 		{"INC HL", 1, cpu.INC_HL},          // 0x23
 		{"INC H", 1, cpu.INC_H},            // 0x24
 		{"DEC H", 1, cpu.DEC_H},            // 0x25
@@ -861,7 +982,7 @@ func (cpu *CPU) CreateTable() {
 		{"DAA", 1, cpu.DAA},                // 0x27
 		{"JR Z, r8", 2, cpu.JR_Z_r8},       // 0x28
 		{"ADD HL, HL", 1, cpu.ADD_HL_HL},   // 0x29
-		{"LD A, (HL+)", 1, cpu.LD_A_HLp},   // 0x2A
+		{"LD A, (HL+)", 1, cpu.LDi_A_HLp},  // 0x2A
 		{"DEC HL", 1, cpu.DEC_HL},          // 0x2B
 		{"INC L", 1, cpu.INC_L},            // 0x2C
 		{"DEC L", 1, cpu.DEC_L},            // 0x2D
