@@ -1010,7 +1010,7 @@ func (cpu *CPU) ADD_A_L(stepInfo *OperandInfo) {
 }
 
 // 0x86 - ADD A, (HL+)
-func (cpu *CPU) ADD_A_HLp(stepInfo *OperandInfo) {
+func (cpu *CPU) ADD_A_HL(stepInfo *OperandInfo) {
 	cpu.ADD(&cpu.regs.a, cpu.mem.Read8(cpu.regs.GetHL()))
 }
 
@@ -1049,8 +1049,8 @@ func (cpu *CPU) ADC_A_L(stepInfo *OperandInfo) {
 	cpu.ADC(cpu.regs.l)
 }
 
-// 0x8E - ADC A, (HL+)
-func (cpu *CPU) ADC_A_HLp(stepInfo *OperandInfo) {
+// 0x8E - ADC A, (HL)
+func (cpu *CPU) ADC_A_HL(stepInfo *OperandInfo) {
 	cpu.ADC(cpu.mem.Read8(cpu.regs.GetHL()))
 }
 
@@ -1090,7 +1090,7 @@ func (cpu *CPU) SUB_L(stepInfo *OperandInfo) {
 }
 
 // 0x96 - SUB (HL+)
-func (cpu *CPU) SUB_HLp(stepInfo *OperandInfo) {
+func (cpu *CPU) SUB_HL(stepInfo *OperandInfo) {
 	cpu.SUB(cpu.mem.Read8(cpu.regs.GetHL()))
 }
 
@@ -1129,8 +1129,8 @@ func (cpu *CPU) SBC_A_L(stepInfo *OperandInfo) {
 	cpu.SBC(cpu.regs.l)
 }
 
-// 0x9E - SBC A, (HL+)
-func (cpu *CPU) SBC_A_HLp(stepInfo *OperandInfo) {
+// 0x9E - SBC A, (HL)
+func (cpu *CPU) SBC_A_HL(stepInfo *OperandInfo) {
 	cpu.SBC(cpu.mem.Read8(cpu.regs.GetHL()))
 }
 
@@ -1169,8 +1169,8 @@ func (cpu *CPU) AND_L(stepInfo *OperandInfo) {
 	cpu.AND(cpu.regs.l)
 }
 
-// 0xA6 - AND (HL+)
-func (cpu *CPU) AND_HLp(stepInfo *OperandInfo) {
+// 0xA6 - AND (HL)
+func (cpu *CPU) AND_HL(stepInfo *OperandInfo) {
 	cpu.AND(cpu.mem.Read8(cpu.regs.GetHL()))
 }
 
@@ -1209,8 +1209,8 @@ func (cpu *CPU) XOR_L(stepInfo *OperandInfo) {
 	cpu.XOR(cpu.regs.l)
 }
 
-// 0xAE - XOR (HL+)
-func (cpu *CPU) XOR_HLp(stepInfo *OperandInfo) {
+// 0xAE - XOR (HL)
+func (cpu *CPU) XOR_HL(stepInfo *OperandInfo) {
 	cpu.XOR(cpu.mem.Read8(cpu.regs.GetHL()))
 }
 
@@ -1249,8 +1249,8 @@ func (cpu *CPU) OR_L(stepInfo *OperandInfo) {
 	cpu.OR(cpu.regs.l)
 }
 
-// 0xB6 - OR (HL+)
-func (cpu *CPU) OR_HLp(stepInfo *OperandInfo) {
+// 0xB6 - OR (HL)
+func (cpu *CPU) OR_HL(stepInfo *OperandInfo) {
 	cpu.OR(cpu.mem.Read8(cpu.regs.GetHL()))
 }
 
@@ -1278,6 +1278,28 @@ func (cpu *CPU) CP_D(stepInfo *OperandInfo) {
 func (cpu *CPU) CP_E(stepInfo *OperandInfo) {
 	cpu.CP(cpu.regs.e)
 }
+
+// 0xBC - CP H
+func (cpu *CPU) CP_H(stepInfo *OperandInfo) {
+	cpu.CP(cpu.regs.h)
+}
+
+// 0xBD - CP L
+func (cpu *CPU) CP_L(stepInfo *OperandInfo) {
+	cpu.CP(cpu.regs.l)
+}
+
+// 0xBE - CP (HL)
+func (cpu *CPU) CP_HL(stepInfo *OperandInfo) {
+	cpu.CP(cpu.mem.Read8(cpu.regs.GetHL()))
+}
+
+//  0xBF - CP A
+func (cpu *CPU) CP_A(stepInfo *OperandInfo) {
+	cpu.CP(cpu.regs.a)
+}
+
+// 0xC0 - RET NZ
 
 func (cpu *CPU) UNKNOWN(stepInfo *OperandInfo) {
 	fmt.Printf("Unknown opcode!")
@@ -1384,6 +1406,104 @@ func (cpu *CPU) CreateTable() {
 		{"LD E, (HL+)", 1, cpu.LD_E_HLp},   // 0x5E
 		{"LD E, A", 1, cpu.LD_E_A},         // 0x5F
 		{"LD H, B", 1, cpu.LD_H_B},         // 0x60
+		{"LD H, C", 1, cpu.LD_H_C},         // 0x61
+		{"LD H, D", 1, cpu.LD_H_D},         // 0x62
+		{"LD H, E", 1, cpu.LD_H_E},         // 0x63
+		{"LD H, H", 1, cpu.LD_H_H},         // 0x64
+		{"LD H, L", 1, cpu.LD_H_L},         // 0x65
+		{"LD H, (HL+)", 1, cpu.LD_H_HLp},   // 0x66
+		{"LD H, A", 1, cpu.LD_H_A},         // 0x67
+		{"LD L, B", 1, cpu.LD_L_B},         // 0x68
+		{"LD L, C", 1, cpu.LD_L_C},         // 0x69
+		{"LD L, D", 1, cpu.LD_L_D},         // 0x6A
+		{"LD L, E", 1, cpu.LD_L_E},         // 0x6B
+		{"LD L, H", 1, cpu.LD_L_H},         // 0x6C
+		{"LD L, L", 1, cpu.LD_L_L},         // 0x6D
+		{"LD L, (HL+)", 1, cpu.LD_L_HLp},   // 0x6E
+		{"LD L, A", 1, cpu.LD_L_A},         // 0x6F
+		{"LD (HL+), B", 1, cpu.LD_HLp_B},   // 0x70
+		{"LD (HL+), C", 1, cpu.LD_HLp_C},   // 0x71
+		{"LD (HL+), D", 1, cpu.LD_HLp_D},   // 0x72
+		{"LD (HL+), E", 1, cpu.LD_HLp_E},   // 0x73
+		{"LD (HL+), H", 1, cpu.LD_HLp_H},   // 0x74
+		{"LD (HL+), L", 1, cpu.LD_HLp_L},   // 0x75
+		{"HALT", 1, cpu.HALT},              // 0x76
+		{"LD (HL), A", 1, cpu.LD_HL_A},     // 0x77
+		{"LD A, B", 1, cpu.LD_A_B},         // 0x78
+		{"LD A, C", 1, cpu.LD_A_C},         // 0x79
+		{"LD A, D", 1, cpu.LD_A_D},         // 0x7A
+		{"LD A, E", 1, cpu.LD_A_E},         // 0x7B
+		{"LD A, H", 1, cpu.LD_A_H},         // 0x7C
+		{"LD A, L", 1, cpu.LD_A_L},         // 0x7D
+		{"LD A, (HL+)", 1, cpu.LD_A_HLp},   // 0x7E
+		{"LD A, A", 1, cpu.LD_A_A},         // 0x7F
+		{"ADD A, B", 1, cpu.ADD_A_B},       // 0x80
+		{"ADD A, C", 1, cpu.ADD_A_C},       // 0x81
+		{"ADD A, D", 1, cpu.ADD_A_D},       // 0x82
+		{"ADD A, E", 1, cpu.ADD_A_E},       // 0x83
+		{"ADD A, H", 1, cpu.ADD_A_H},       // 0x84
+		{"ADD A, L", 1, cpu.ADD_A_L},       // 0x85
+		{"ADD A, (HL)", 1, cpu.ADD_A_HL},   // 0x86
+		{"ADD A, A", 1, cpu.ADD_A_A},       // 0x87
+		{"ADC A, B", 1, cpu.ADC_A_B},       // 0x88
+		{"ADC A, C", 1, cpu.ADC_A_C},       // 0x89
+		{"ADC A, D", 1, cpu.ADC_A_D},       // 0x8A
+		{"ADC A, E", 1, cpu.ADC_A_E},       // 0x8B
+		{"ADC A, H", 1, cpu.ADC_A_H},       // 0x8C
+		{"ADC A, L", 1, cpu.ADC_A_L},       // 0x8D
+		{"ADC A, (HL)", 1, cpu.ADC_A_HL},   // 0x8E
+		{"ADC A, A", 1, cpu.ADC_A_A},       // 0x8F
+		{"SUB B", 1, cpu.SUB_B},            // 0x90
+		{"SUB C", 1, cpu.SUB_C},            // 0x91
+		{"SUB D", 1, cpu.SUB_D},            // 0x92
+		{"SUB E", 1, cpu.SUB_E},            // 0x93
+		{"SUB H", 1, cpu.SUB_H},            // 0x94
+		{"SUB L", 1, cpu.SUB_L},            // 0x95
+		{"SUB (HL)", 1, cpu.SUB_HL},        // 0x96
+		{"SUB A", 1, cpu.SUB_A},            // 0x97
+		{"SBC A, B", 1, cpu.SBC_A_B},       // 0x98
+		{"SBC A, C", 1, cpu.SBC_A_C},       // 0x99
+		{"SBC A, D", 1, cpu.SBC_A_D},       // 0x9A
+		{"SBC A, E", 1, cpu.SBC_A_E},       // 0x9B
+		{"SBC A, H", 1, cpu.SBC_A_H},       // 0x9C
+		{"SBC A, L", 1, cpu.SBC_A_L},       // 0x9D
+		{"SBC A, (HL)", 1, cpu.SBC_A_HL},   // 0x9E
+		{"SBC A, A", 1, cpu.SBC_A_A},       // 0x9F
+		{"AND B", 1, cpu.AND_B},            // 0xA0
+		{"AND C", 1, cpu.AND_C},            // 0xA1
+		{"AND D", 1, cpu.AND_D},            // 0xA2
+		{"AND E", 1, cpu.AND_E},            // 0xA3
+		{"AND H", 1, cpu.AND_H},            // 0xA4
+		{"AND L", 1, cpu.AND_L},            // 0xA5
+		{"AND (HL)", 1, cpu.AND_HL},        // 0xA6
+		{"AND A", 1, cpu.AND_A},            // 0xA7
+		{"XOR B", 1, cpu.XOR_B},            // 0xA8
+		{"XOR C", 1, cpu.XOR_C},            // 0xA9
+		{"XOR D", 1, cpu.XOR_D},            // 0xAA
+		{"XOR E", 1, cpu.XOR_E},            // 0xAB
+		{"XOR H", 1, cpu.XOR_H},            // 0xAC
+		{"XOR L", 1, cpu.XOR_L},            // 0xAD
+		{"XOR (HL)", 1, cpu.XOR_HL},        // 0xAE
+		{"XOR A", 1, cpu.XOR_A},            // 0xAF
+		{"OR B", 1, cpu.OR_B},              // 0xB0
+		{"OR C", 1, cpu.OR_C},              // 0xB1
+		{"OR D", 1, cpu.OR_D},              // 0xB2
+		{"OR E", 1, cpu.OR_E},              // 0xB3
+		{"OR H", 1, cpu.OR_H},              // 0xB4
+		{"OR L", 1, cpu.OR_L},              // 0xB5
+		{"OR (HL)", 1, cpu.OR_HL},          // 0xB6
+		{"OR A", 1, cpu.OR_A},              // 0xB7
+		{"CP B", 1, cpu.CP_B},              // 0xB8
+		{"CP C", 1, cpu.CP_C},              // 0xB9
+		{"CP D", 1, cpu.CP_D},              // 0xBA
+		{"CP E", 1, cpu.CP_E},              // 0xBB
+		{"CP H", 1, cpu.CP_H},              // 0xBC
+		{"CP L", 1, cpu.CP_L},              // 0xBD
+		{"CP (HL)", 1, cpu.CP_HL},          // 0xBE
+		{"CP A", 1, cpu.CP_A},              // 0xBF
+		// {"RET NZ", 1, cpu.RET_NZ},          // 0xC0
+		// {"POP BC", 1, cpu.POP_BC},          // 0xC1
+		// {"JP NZ, nn", 3, cpu.JP_NZ_nn},     // 0xC2
 
 	}
 }
