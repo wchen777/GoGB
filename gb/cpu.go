@@ -1300,6 +1300,33 @@ func (cpu *CPU) CP_A(stepInfo *OperandInfo) {
 }
 
 // 0xC0 - RET NZ
+func (cpu *CPU) RET_NZ(stepInfo *OperandInfo) {
+	// TODO: check this
+	if cpu.regs.GetZero() == 0 {
+		cpu.regs.pc = cpu.mem.Read16(cpu.regs.sp)
+		cpu.regs.sp += 2
+	}
+
+	cpu.regs.pc++
+}
+
+// 0xC1 - POP BC
+func (cpu *CPU) POP_BC(stepInfo *OperandInfo) {
+	// TODO: check this
+	cpu.regs.SetBC(cpu.mem.Read16(cpu.regs.sp))
+	cpu.regs.sp += 2
+	cpu.regs.pc++
+}
+
+// 0xC2 - JP NZ,nn
+func (cpu *CPU) JP_NZ_NN(stepInfo *OperandInfo) {
+	// TODO: check this
+	if cpu.regs.GetZero() == 0 {
+		cpu.regs.pc = stepInfo.operand16
+	} else {
+		cpu.regs.pc += 3
+	}
+}
 
 func (cpu *CPU) UNKNOWN(stepInfo *OperandInfo) {
 	fmt.Printf("Unknown opcode!")
