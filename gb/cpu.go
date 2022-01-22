@@ -1328,6 +1328,12 @@ func (cpu *CPU) JP_NZ_NN(stepInfo *OperandInfo) {
 	}
 }
 
+// 0xC3 - JP nn
+func (cpu *CPU) JP_NN(stepInfo *OperandInfo) {
+	// TODO: check this
+	cpu.regs.pc = stepInfo.operand16
+}
+
 func (cpu *CPU) UNKNOWN(stepInfo *OperandInfo) {
 	fmt.Printf("Unknown opcode!")
 }
