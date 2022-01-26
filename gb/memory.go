@@ -56,3 +56,11 @@ func (mem *Memory) Write16(address uint16, value uint16) {
 func (mem *Memory) Read16(address uint16) uint16 {
 	return 0
 }
+
+//
+func (mem *Memory) WriteToStack16(value uint16, sp *uint16) {
+	// decrement sp by 2
+	*sp -= 2
+
+	// call write 16 to sp
+}

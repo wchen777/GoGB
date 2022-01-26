@@ -1330,8 +1330,30 @@ func (cpu *CPU) JP_NZ_NN(stepInfo *OperandInfo) {
 
 // 0xC3 - JP nn
 func (cpu *CPU) JP_NN(stepInfo *OperandInfo) {
-	// TODO: check this
 	cpu.regs.pc = stepInfo.operand16
+}
+
+// 0xC4 - CALL NZ, a16
+func (cpu *CPU) CALL_NZ_a16(stepInfo *OperandInfo) {
+
+	if cpu.regs.GetZero() == 1 {
+		cpu.ticks += 12
+	} else {
+		cpu.mem.WriteToStack16(cpu.regs.pc, &cpu.regs.sp)
+		cpu.regs.pc = stepInfo.operand16
+		cpu.ticks += 24
+	}
+
+}
+
+// 0xC5 - PUSH BC
+func (cpu *CPU) PUSH_BC(stepInfo *OperandInfo) {
+	// TODO: this
+}
+
+// 0xC6 - ADD A, d8
+func (cpu *CPU) ADD_A_d8(stepInfo *OperandInfo) {
+	// TODO: this
 }
 
 func (cpu *CPU) UNKNOWN(stepInfo *OperandInfo) {
@@ -1534,9 +1556,9 @@ func (cpu *CPU) CreateTable() {
 		{"CP L", 1, cpu.CP_L},              // 0xBD
 		{"CP (HL)", 1, cpu.CP_HL},          // 0xBE
 		{"CP A", 1, cpu.CP_A},              // 0xBF
-		// {"RET NZ", 1, cpu.RET_NZ},          // 0xC0
-		// {"POP BC", 1, cpu.POP_BC},          // 0xC1
-		// {"JP NZ, nn", 3, cpu.JP_NZ_nn},     // 0xC2
+		{"RET NZ", 1, cpu.RET_NZ},          // 0xC0
+		{"POP BC", 1, cpu.POP_BC},          // 0xC1
+		{"JP NZ, nn", 3, cpu.JP_NZ_NN},     // 0xC2
 
 	}
 }
