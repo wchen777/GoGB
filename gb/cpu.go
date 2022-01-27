@@ -1356,6 +1356,8 @@ func (cpu *CPU) ADD_A_d8(stepInfo *OperandInfo) {
 	// TODO: this
 }
 
+// 0xC7
+
 func (cpu *CPU) UNKNOWN(stepInfo *OperandInfo) {
 	fmt.Printf("Unknown opcode!")
 }
@@ -1364,201 +1366,202 @@ func (cpu *CPU) UNKNOWN(stepInfo *OperandInfo) {
 
 func (cpu *CPU) CreateTable() {
 	cpu.table = [256]Instruction{
-		{"NOP", 0, cpu.NOP},                // 0x00
-		{"LD BC, d16", 3, cpu.LD_BC_d16},   // 0x01
-		{"LD (BC), A", 1, cpu.LD_BC_A},     // 0x02
-		{"INC BC", 1, cpu.INC_BC},          // 0x03
-		{"INC B", 1, cpu.INC_B},            // 0x04
-		{"DEC B", 1, cpu.DEC_B},            // 0x05
-		{"LD B, d8", 2, cpu.LD_B_d8},       // 0x06
-		{"RLCA", 1, cpu.RLCA},              // 0x07
-		{"LD (a16), SP", 3, cpu.LD_a16_SP}, // 0x08
-		{"ADD HL, BC", 1, cpu.ADD_HL_BC},   // 0x09
-		{"LD A, (BC)", 1, cpu.LD_A_BC},     // 0x0A
-		{"DEC BC", 1, cpu.DEC_BC},          // 0x0B
-		{"INC C", 1, cpu.INC_C},            // 0x0C
-		{"DEC C", 1, cpu.DEC_C},            // 0x0D
-		{"LD C, d8", 2, cpu.LD_C_d8},       // 0x0E
-		{"RRCA", 1, cpu.RRCA},              // 0x0F
-		{"STOP", 1, cpu.STOP},              // 0x10
-		{"LD DE, d16", 3, cpu.LD_DE_d16},   // 0x11
-		{"LD (DE), A", 1, cpu.LD_DE_A},     // 0x12
-		{"INC DE", 1, cpu.INC_DE},          // 0x13
-		{"INC D", 1, cpu.INC_D},            // 0x14
-		{"DEC D", 1, cpu.DEC_D},            // 0x15
-		{"LD D, d8", 2, cpu.LD_D_d8},       // 0x16
-		{"RLA", 1, cpu.RLA},                // 0x17
-		{"JR r8", 2, cpu.JR_r8},            // 0x18
-		{"ADD HL, DE", 1, cpu.ADD_HL_DE},   // 0x19
-		{"LD A, (DE)", 1, cpu.LD_A_DE},     // 0x1A
-		{"DEC DE", 1, cpu.DEC_DE},          // 0x1B
-		{"INC E", 1, cpu.INC_E},            // 0x1C
-		{"DEC E", 1, cpu.DEC_E},            // 0x1D
-		{"LD E, d8", 2, cpu.LD_E_d8},       // 0x1E
-		{"RRA", 1, cpu.RRA},                // 0x1F
-		{"JR NZ, r8", 2, cpu.JR_NZ_r8},     // 0x20
-		{"LD HL, d16", 3, cpu.LD_HL_d16},   // 0x21
-		{"LD (HL+), A", 1, cpu.LDi_HLp_A},  // 0x22
-		{"INC HL", 1, cpu.INC_HL},          // 0x23
-		{"INC H", 1, cpu.INC_H},            // 0x24
-		{"DEC H", 1, cpu.DEC_H},            // 0x25
-		{"LD H, d8", 2, cpu.LD_H_d8},       // 0x26
-		{"DAA", 1, cpu.DAA},                // 0x27
-		{"JR Z, r8", 2, cpu.JR_Z_r8},       // 0x28
-		{"ADD HL, HL", 1, cpu.ADD_HL_HL},   // 0x29
-		{"LD A, (HL+)", 1, cpu.LDi_A_HLp},  // 0x2A
-		{"DEC HL", 1, cpu.DEC_HL},          // 0x2B
-		{"INC L", 1, cpu.INC_L},            // 0x2C
-		{"DEC L", 1, cpu.DEC_L},            // 0x2D
-		{"LD L, d8", 2, cpu.LD_L_d8},       // 0x2E
-		{"CPL", 1, cpu.CPL},                // 0x2F
-		{"JR NC, r8", 2, cpu.JR_NC_r8},     // 0x30
-		{"LD SP, d16", 3, cpu.LD_SP_d16},   // 0x31
-		{"LD (HL-), A", 1, cpu.LD_HLm_A},   // 0x32
-		{"INC SP", 1, cpu.INC_SP},          // 0x33
-		{"INC (HL+)", 1, cpu.INC_HLp},      // 0x34
-		{"DEC (HL)", 1, cpu.DEC_HLp},       // 0x35
-		{"LD (HL), d8", 2, cpu.LD_HLp_d8},  // 0x36
-		{"SCF", 1, cpu.SCF},                // 0x37
-		{"JR C, r8", 2, cpu.JR_C_r8},       // 0x38
-		{"ADD HL, SP", 1, cpu.ADD_HL_SP},   // 0x39
-		{"LD A, (HL-)", 1, cpu.LD_A_HLm},   // 0x3A
-		{"DEC SP", 1, cpu.DEC_SP},          // 0x3B
-		{"INC A", 1, cpu.INC_A},            // 0x3C
-		{"DEC A", 1, cpu.DEC_A},            // 0x3D
-		{"LD A, d8", 2, cpu.LD_A_d8},       // 0x3E
-		{"CCF", 1, cpu.CCF},                // 0x3F
-		{"LD B, B", 1, cpu.LD_B_B},         // 0x40
-		{"LD B, C", 1, cpu.LD_B_C},         // 0x41
-		{"LD B, D", 1, cpu.LD_B_D},         // 0x42
-		{"LD B, E", 1, cpu.LD_B_E},         // 0x43
-		{"LD B, H", 1, cpu.LD_B_H},         // 0x44
-		{"LD B, L", 1, cpu.LD_B_L},         // 0x45
-		{"LD B, (HL+)", 1, cpu.LD_B_HLp},   // 0x46
-		{"LD B, A", 1, cpu.LD_B_A},         // 0x47
-		{"LD C, B", 1, cpu.LD_C_B},         // 0x48
-		{"LD C, C", 1, cpu.LD_C_C},         // 0x49
-		{"LD C, D", 1, cpu.LD_C_D},         // 0x4A
-		{"LD C, E", 1, cpu.LD_C_E},         // 0x4B
-		{"LD C, H", 1, cpu.LD_C_H},         // 0x4C
-		{"LD C, L", 1, cpu.LD_C_L},         // 0x4D
-		{"LD C, (HL+)", 1, cpu.LD_C_HLp},   // 0x4E
-		{"LD C, A", 1, cpu.LD_C_A},         // 0x4F
-		{"LD D, B", 1, cpu.LD_D_B},         // 0x50
-		{"LD D, C", 1, cpu.LD_D_C},         // 0x51
-		{"LD D, D", 1, cpu.LD_D_D},         // 0x52
-		{"LD D, E", 1, cpu.LD_D_E},         // 0x53
-		{"LD D, H", 1, cpu.LD_D_H},         // 0x54
-		{"LD D, L", 1, cpu.LD_D_L},         // 0x55
-		{"LD D, (HL+)", 1, cpu.LD_D_HLp},   // 0x56
-		{"LD D, A", 1, cpu.LD_D_A},         // 0x57
-		{"LD E, B", 1, cpu.LD_E_B},         // 0x58
-		{"LD E, C", 1, cpu.LD_E_C},         // 0x59
-		{"LD E, D", 1, cpu.LD_E_D},         // 0x5A
-		{"LD E, E", 1, cpu.LD_E_E},         // 0x5B
-		{"LD E, H", 1, cpu.LD_E_H},         // 0x5C
-		{"LD E, L", 1, cpu.LD_E_L},         // 0x5D
-		{"LD E, (HL+)", 1, cpu.LD_E_HLp},   // 0x5E
-		{"LD E, A", 1, cpu.LD_E_A},         // 0x5F
-		{"LD H, B", 1, cpu.LD_H_B},         // 0x60
-		{"LD H, C", 1, cpu.LD_H_C},         // 0x61
-		{"LD H, D", 1, cpu.LD_H_D},         // 0x62
-		{"LD H, E", 1, cpu.LD_H_E},         // 0x63
-		{"LD H, H", 1, cpu.LD_H_H},         // 0x64
-		{"LD H, L", 1, cpu.LD_H_L},         // 0x65
-		{"LD H, (HL+)", 1, cpu.LD_H_HLp},   // 0x66
-		{"LD H, A", 1, cpu.LD_H_A},         // 0x67
-		{"LD L, B", 1, cpu.LD_L_B},         // 0x68
-		{"LD L, C", 1, cpu.LD_L_C},         // 0x69
-		{"LD L, D", 1, cpu.LD_L_D},         // 0x6A
-		{"LD L, E", 1, cpu.LD_L_E},         // 0x6B
-		{"LD L, H", 1, cpu.LD_L_H},         // 0x6C
-		{"LD L, L", 1, cpu.LD_L_L},         // 0x6D
-		{"LD L, (HL+)", 1, cpu.LD_L_HLp},   // 0x6E
-		{"LD L, A", 1, cpu.LD_L_A},         // 0x6F
-		{"LD (HL+), B", 1, cpu.LD_HLp_B},   // 0x70
-		{"LD (HL+), C", 1, cpu.LD_HLp_C},   // 0x71
-		{"LD (HL+), D", 1, cpu.LD_HLp_D},   // 0x72
-		{"LD (HL+), E", 1, cpu.LD_HLp_E},   // 0x73
-		{"LD (HL+), H", 1, cpu.LD_HLp_H},   // 0x74
-		{"LD (HL+), L", 1, cpu.LD_HLp_L},   // 0x75
-		{"HALT", 1, cpu.HALT},              // 0x76
-		{"LD (HL), A", 1, cpu.LD_HL_A},     // 0x77
-		{"LD A, B", 1, cpu.LD_A_B},         // 0x78
-		{"LD A, C", 1, cpu.LD_A_C},         // 0x79
-		{"LD A, D", 1, cpu.LD_A_D},         // 0x7A
-		{"LD A, E", 1, cpu.LD_A_E},         // 0x7B
-		{"LD A, H", 1, cpu.LD_A_H},         // 0x7C
-		{"LD A, L", 1, cpu.LD_A_L},         // 0x7D
-		{"LD A, (HL+)", 1, cpu.LD_A_HLp},   // 0x7E
-		{"LD A, A", 1, cpu.LD_A_A},         // 0x7F
-		{"ADD A, B", 1, cpu.ADD_A_B},       // 0x80
-		{"ADD A, C", 1, cpu.ADD_A_C},       // 0x81
-		{"ADD A, D", 1, cpu.ADD_A_D},       // 0x82
-		{"ADD A, E", 1, cpu.ADD_A_E},       // 0x83
-		{"ADD A, H", 1, cpu.ADD_A_H},       // 0x84
-		{"ADD A, L", 1, cpu.ADD_A_L},       // 0x85
-		{"ADD A, (HL)", 1, cpu.ADD_A_HL},   // 0x86
-		{"ADD A, A", 1, cpu.ADD_A_A},       // 0x87
-		{"ADC A, B", 1, cpu.ADC_A_B},       // 0x88
-		{"ADC A, C", 1, cpu.ADC_A_C},       // 0x89
-		{"ADC A, D", 1, cpu.ADC_A_D},       // 0x8A
-		{"ADC A, E", 1, cpu.ADC_A_E},       // 0x8B
-		{"ADC A, H", 1, cpu.ADC_A_H},       // 0x8C
-		{"ADC A, L", 1, cpu.ADC_A_L},       // 0x8D
-		{"ADC A, (HL)", 1, cpu.ADC_A_HL},   // 0x8E
-		{"ADC A, A", 1, cpu.ADC_A_A},       // 0x8F
-		{"SUB B", 1, cpu.SUB_B},            // 0x90
-		{"SUB C", 1, cpu.SUB_C},            // 0x91
-		{"SUB D", 1, cpu.SUB_D},            // 0x92
-		{"SUB E", 1, cpu.SUB_E},            // 0x93
-		{"SUB H", 1, cpu.SUB_H},            // 0x94
-		{"SUB L", 1, cpu.SUB_L},            // 0x95
-		{"SUB (HL)", 1, cpu.SUB_HL},        // 0x96
-		{"SUB A", 1, cpu.SUB_A},            // 0x97
-		{"SBC A, B", 1, cpu.SBC_A_B},       // 0x98
-		{"SBC A, C", 1, cpu.SBC_A_C},       // 0x99
-		{"SBC A, D", 1, cpu.SBC_A_D},       // 0x9A
-		{"SBC A, E", 1, cpu.SBC_A_E},       // 0x9B
-		{"SBC A, H", 1, cpu.SBC_A_H},       // 0x9C
-		{"SBC A, L", 1, cpu.SBC_A_L},       // 0x9D
-		{"SBC A, (HL)", 1, cpu.SBC_A_HL},   // 0x9E
-		{"SBC A, A", 1, cpu.SBC_A_A},       // 0x9F
-		{"AND B", 1, cpu.AND_B},            // 0xA0
-		{"AND C", 1, cpu.AND_C},            // 0xA1
-		{"AND D", 1, cpu.AND_D},            // 0xA2
-		{"AND E", 1, cpu.AND_E},            // 0xA3
-		{"AND H", 1, cpu.AND_H},            // 0xA4
-		{"AND L", 1, cpu.AND_L},            // 0xA5
-		{"AND (HL)", 1, cpu.AND_HL},        // 0xA6
-		{"AND A", 1, cpu.AND_A},            // 0xA7
-		{"XOR B", 1, cpu.XOR_B},            // 0xA8
-		{"XOR C", 1, cpu.XOR_C},            // 0xA9
-		{"XOR D", 1, cpu.XOR_D},            // 0xAA
-		{"XOR E", 1, cpu.XOR_E},            // 0xAB
-		{"XOR H", 1, cpu.XOR_H},            // 0xAC
-		{"XOR L", 1, cpu.XOR_L},            // 0xAD
-		{"XOR (HL)", 1, cpu.XOR_HL},        // 0xAE
-		{"XOR A", 1, cpu.XOR_A},            // 0xAF
-		{"OR B", 1, cpu.OR_B},              // 0xB0
-		{"OR C", 1, cpu.OR_C},              // 0xB1
-		{"OR D", 1, cpu.OR_D},              // 0xB2
-		{"OR E", 1, cpu.OR_E},              // 0xB3
-		{"OR H", 1, cpu.OR_H},              // 0xB4
-		{"OR L", 1, cpu.OR_L},              // 0xB5
-		{"OR (HL)", 1, cpu.OR_HL},          // 0xB6
-		{"OR A", 1, cpu.OR_A},              // 0xB7
-		{"CP B", 1, cpu.CP_B},              // 0xB8
-		{"CP C", 1, cpu.CP_C},              // 0xB9
-		{"CP D", 1, cpu.CP_D},              // 0xBA
-		{"CP E", 1, cpu.CP_E},              // 0xBB
-		{"CP H", 1, cpu.CP_H},              // 0xBC
-		{"CP L", 1, cpu.CP_L},              // 0xBD
-		{"CP (HL)", 1, cpu.CP_HL},          // 0xBE
-		{"CP A", 1, cpu.CP_A},              // 0xBF
-		{"RET NZ", 1, cpu.RET_NZ},          // 0xC0
-		{"POP BC", 1, cpu.POP_BC},          // 0xC1
-		{"JP NZ, nn", 3, cpu.JP_NZ_NN},     // 0xC2
+		{"NOP", 0, cpu.NOP},                  // 0x00
+		{"LD BC, d16", 3, cpu.LD_BC_d16},     // 0x01
+		{"LD (BC), A", 1, cpu.LD_BC_A},       // 0x02
+		{"INC BC", 1, cpu.INC_BC},            // 0x03
+		{"INC B", 1, cpu.INC_B},              // 0x04
+		{"DEC B", 1, cpu.DEC_B},              // 0x05
+		{"LD B, d8", 2, cpu.LD_B_d8},         // 0x06
+		{"RLCA", 1, cpu.RLCA},                // 0x07
+		{"LD (a16), SP", 3, cpu.LD_a16_SP},   // 0x08
+		{"ADD HL, BC", 1, cpu.ADD_HL_BC},     // 0x09
+		{"LD A, (BC)", 1, cpu.LD_A_BC},       // 0x0A
+		{"DEC BC", 1, cpu.DEC_BC},            // 0x0B
+		{"INC C", 1, cpu.INC_C},              // 0x0C
+		{"DEC C", 1, cpu.DEC_C},              // 0x0D
+		{"LD C, d8", 2, cpu.LD_C_d8},         // 0x0E
+		{"RRCA", 1, cpu.RRCA},                // 0x0F
+		{"STOP", 1, cpu.STOP},                // 0x10
+		{"LD DE, d16", 3, cpu.LD_DE_d16},     // 0x11
+		{"LD (DE), A", 1, cpu.LD_DE_A},       // 0x12
+		{"INC DE", 1, cpu.INC_DE},            // 0x13
+		{"INC D", 1, cpu.INC_D},              // 0x14
+		{"DEC D", 1, cpu.DEC_D},              // 0x15
+		{"LD D, d8", 2, cpu.LD_D_d8},         // 0x16
+		{"RLA", 1, cpu.RLA},                  // 0x17
+		{"JR r8", 2, cpu.JR_r8},              // 0x18
+		{"ADD HL, DE", 1, cpu.ADD_HL_DE},     // 0x19
+		{"LD A, (DE)", 1, cpu.LD_A_DE},       // 0x1A
+		{"DEC DE", 1, cpu.DEC_DE},            // 0x1B
+		{"INC E", 1, cpu.INC_E},              // 0x1C
+		{"DEC E", 1, cpu.DEC_E},              // 0x1D
+		{"LD E, d8", 2, cpu.LD_E_d8},         // 0x1E
+		{"RRA", 1, cpu.RRA},                  // 0x1F
+		{"JR NZ, r8", 2, cpu.JR_NZ_r8},       // 0x20
+		{"LD HL, d16", 3, cpu.LD_HL_d16},     // 0x21
+		{"LD (HL+), A", 1, cpu.LDi_HLp_A},    // 0x22
+		{"INC HL", 1, cpu.INC_HL},            // 0x23
+		{"INC H", 1, cpu.INC_H},              // 0x24
+		{"DEC H", 1, cpu.DEC_H},              // 0x25
+		{"LD H, d8", 2, cpu.LD_H_d8},         // 0x26
+		{"DAA", 1, cpu.DAA},                  // 0x27
+		{"JR Z, r8", 2, cpu.JR_Z_r8},         // 0x28
+		{"ADD HL, HL", 1, cpu.ADD_HL_HL},     // 0x29
+		{"LD A, (HL+)", 1, cpu.LDi_A_HLp},    // 0x2A
+		{"DEC HL", 1, cpu.DEC_HL},            // 0x2B
+		{"INC L", 1, cpu.INC_L},              // 0x2C
+		{"DEC L", 1, cpu.DEC_L},              // 0x2D
+		{"LD L, d8", 2, cpu.LD_L_d8},         // 0x2E
+		{"CPL", 1, cpu.CPL},                  // 0x2F
+		{"JR NC, r8", 2, cpu.JR_NC_r8},       // 0x30
+		{"LD SP, d16", 3, cpu.LD_SP_d16},     // 0x31
+		{"LD (HL-), A", 1, cpu.LD_HLm_A},     // 0x32
+		{"INC SP", 1, cpu.INC_SP},            // 0x33
+		{"INC (HL+)", 1, cpu.INC_HLp},        // 0x34
+		{"DEC (HL)", 1, cpu.DEC_HLp},         // 0x35
+		{"LD (HL), d8", 2, cpu.LD_HLp_d8},    // 0x36
+		{"SCF", 1, cpu.SCF},                  // 0x37
+		{"JR C, r8", 2, cpu.JR_C_r8},         // 0x38
+		{"ADD HL, SP", 1, cpu.ADD_HL_SP},     // 0x39
+		{"LD A, (HL-)", 1, cpu.LD_A_HLm},     // 0x3A
+		{"DEC SP", 1, cpu.DEC_SP},            // 0x3B
+		{"INC A", 1, cpu.INC_A},              // 0x3C
+		{"DEC A", 1, cpu.DEC_A},              // 0x3D
+		{"LD A, d8", 2, cpu.LD_A_d8},         // 0x3E
+		{"CCF", 1, cpu.CCF},                  // 0x3F
+		{"LD B, B", 1, cpu.LD_B_B},           // 0x40
+		{"LD B, C", 1, cpu.LD_B_C},           // 0x41
+		{"LD B, D", 1, cpu.LD_B_D},           // 0x42
+		{"LD B, E", 1, cpu.LD_B_E},           // 0x43
+		{"LD B, H", 1, cpu.LD_B_H},           // 0x44
+		{"LD B, L", 1, cpu.LD_B_L},           // 0x45
+		{"LD B, (HL+)", 1, cpu.LD_B_HLp},     // 0x46
+		{"LD B, A", 1, cpu.LD_B_A},           // 0x47
+		{"LD C, B", 1, cpu.LD_C_B},           // 0x48
+		{"LD C, C", 1, cpu.LD_C_C},           // 0x49
+		{"LD C, D", 1, cpu.LD_C_D},           // 0x4A
+		{"LD C, E", 1, cpu.LD_C_E},           // 0x4B
+		{"LD C, H", 1, cpu.LD_C_H},           // 0x4C
+		{"LD C, L", 1, cpu.LD_C_L},           // 0x4D
+		{"LD C, (HL+)", 1, cpu.LD_C_HLp},     // 0x4E
+		{"LD C, A", 1, cpu.LD_C_A},           // 0x4F
+		{"LD D, B", 1, cpu.LD_D_B},           // 0x50
+		{"LD D, C", 1, cpu.LD_D_C},           // 0x51
+		{"LD D, D", 1, cpu.LD_D_D},           // 0x52
+		{"LD D, E", 1, cpu.LD_D_E},           // 0x53
+		{"LD D, H", 1, cpu.LD_D_H},           // 0x54
+		{"LD D, L", 1, cpu.LD_D_L},           // 0x55
+		{"LD D, (HL+)", 1, cpu.LD_D_HLp},     // 0x56
+		{"LD D, A", 1, cpu.LD_D_A},           // 0x57
+		{"LD E, B", 1, cpu.LD_E_B},           // 0x58
+		{"LD E, C", 1, cpu.LD_E_C},           // 0x59
+		{"LD E, D", 1, cpu.LD_E_D},           // 0x5A
+		{"LD E, E", 1, cpu.LD_E_E},           // 0x5B
+		{"LD E, H", 1, cpu.LD_E_H},           // 0x5C
+		{"LD E, L", 1, cpu.LD_E_L},           // 0x5D
+		{"LD E, (HL+)", 1, cpu.LD_E_HLp},     // 0x5E
+		{"LD E, A", 1, cpu.LD_E_A},           // 0x5F
+		{"LD H, B", 1, cpu.LD_H_B},           // 0x60
+		{"LD H, C", 1, cpu.LD_H_C},           // 0x61
+		{"LD H, D", 1, cpu.LD_H_D},           // 0x62
+		{"LD H, E", 1, cpu.LD_H_E},           // 0x63
+		{"LD H, H", 1, cpu.LD_H_H},           // 0x64
+		{"LD H, L", 1, cpu.LD_H_L},           // 0x65
+		{"LD H, (HL+)", 1, cpu.LD_H_HLp},     // 0x66
+		{"LD H, A", 1, cpu.LD_H_A},           // 0x67
+		{"LD L, B", 1, cpu.LD_L_B},           // 0x68
+		{"LD L, C", 1, cpu.LD_L_C},           // 0x69
+		{"LD L, D", 1, cpu.LD_L_D},           // 0x6A
+		{"LD L, E", 1, cpu.LD_L_E},           // 0x6B
+		{"LD L, H", 1, cpu.LD_L_H},           // 0x6C
+		{"LD L, L", 1, cpu.LD_L_L},           // 0x6D
+		{"LD L, (HL+)", 1, cpu.LD_L_HLp},     // 0x6E
+		{"LD L, A", 1, cpu.LD_L_A},           // 0x6F
+		{"LD (HL+), B", 1, cpu.LD_HLp_B},     // 0x70
+		{"LD (HL+), C", 1, cpu.LD_HLp_C},     // 0x71
+		{"LD (HL+), D", 1, cpu.LD_HLp_D},     // 0x72
+		{"LD (HL+), E", 1, cpu.LD_HLp_E},     // 0x73
+		{"LD (HL+), H", 1, cpu.LD_HLp_H},     // 0x74
+		{"LD (HL+), L", 1, cpu.LD_HLp_L},     // 0x75
+		{"HALT", 1, cpu.HALT},                // 0x76
+		{"LD (HL), A", 1, cpu.LD_HL_A},       // 0x77
+		{"LD A, B", 1, cpu.LD_A_B},           // 0x78
+		{"LD A, C", 1, cpu.LD_A_C},           // 0x79
+		{"LD A, D", 1, cpu.LD_A_D},           // 0x7A
+		{"LD A, E", 1, cpu.LD_A_E},           // 0x7B
+		{"LD A, H", 1, cpu.LD_A_H},           // 0x7C
+		{"LD A, L", 1, cpu.LD_A_L},           // 0x7D
+		{"LD A, (HL+)", 1, cpu.LD_A_HLp},     // 0x7E
+		{"LD A, A", 1, cpu.LD_A_A},           // 0x7F
+		{"ADD A, B", 1, cpu.ADD_A_B},         // 0x80
+		{"ADD A, C", 1, cpu.ADD_A_C},         // 0x81
+		{"ADD A, D", 1, cpu.ADD_A_D},         // 0x82
+		{"ADD A, E", 1, cpu.ADD_A_E},         // 0x83
+		{"ADD A, H", 1, cpu.ADD_A_H},         // 0x84
+		{"ADD A, L", 1, cpu.ADD_A_L},         // 0x85
+		{"ADD A, (HL)", 1, cpu.ADD_A_HL},     // 0x86
+		{"ADD A, A", 1, cpu.ADD_A_A},         // 0x87
+		{"ADC A, B", 1, cpu.ADC_A_B},         // 0x88
+		{"ADC A, C", 1, cpu.ADC_A_C},         // 0x89
+		{"ADC A, D", 1, cpu.ADC_A_D},         // 0x8A
+		{"ADC A, E", 1, cpu.ADC_A_E},         // 0x8B
+		{"ADC A, H", 1, cpu.ADC_A_H},         // 0x8C
+		{"ADC A, L", 1, cpu.ADC_A_L},         // 0x8D
+		{"ADC A, (HL)", 1, cpu.ADC_A_HL},     // 0x8E
+		{"ADC A, A", 1, cpu.ADC_A_A},         // 0x8F
+		{"SUB B", 1, cpu.SUB_B},              // 0x90
+		{"SUB C", 1, cpu.SUB_C},              // 0x91
+		{"SUB D", 1, cpu.SUB_D},              // 0x92
+		{"SUB E", 1, cpu.SUB_E},              // 0x93
+		{"SUB H", 1, cpu.SUB_H},              // 0x94
+		{"SUB L", 1, cpu.SUB_L},              // 0x95
+		{"SUB (HL)", 1, cpu.SUB_HL},          // 0x96
+		{"SUB A", 1, cpu.SUB_A},              // 0x97
+		{"SBC A, B", 1, cpu.SBC_A_B},         // 0x98
+		{"SBC A, C", 1, cpu.SBC_A_C},         // 0x99
+		{"SBC A, D", 1, cpu.SBC_A_D},         // 0x9A
+		{"SBC A, E", 1, cpu.SBC_A_E},         // 0x9B
+		{"SBC A, H", 1, cpu.SBC_A_H},         // 0x9C
+		{"SBC A, L", 1, cpu.SBC_A_L},         // 0x9D
+		{"SBC A, (HL)", 1, cpu.SBC_A_HL},     // 0x9E
+		{"SBC A, A", 1, cpu.SBC_A_A},         // 0x9F
+		{"AND B", 1, cpu.AND_B},              // 0xA0
+		{"AND C", 1, cpu.AND_C},              // 0xA1
+		{"AND D", 1, cpu.AND_D},              // 0xA2
+		{"AND E", 1, cpu.AND_E},              // 0xA3
+		{"AND H", 1, cpu.AND_H},              // 0xA4
+		{"AND L", 1, cpu.AND_L},              // 0xA5
+		{"AND (HL)", 1, cpu.AND_HL},          // 0xA6
+		{"AND A", 1, cpu.AND_A},              // 0xA7
+		{"XOR B", 1, cpu.XOR_B},              // 0xA8
+		{"XOR C", 1, cpu.XOR_C},              // 0xA9
+		{"XOR D", 1, cpu.XOR_D},              // 0xAA
+		{"XOR E", 1, cpu.XOR_E},              // 0xAB
+		{"XOR H", 1, cpu.XOR_H},              // 0xAC
+		{"XOR L", 1, cpu.XOR_L},              // 0xAD
+		{"XOR (HL)", 1, cpu.XOR_HL},          // 0xAE
+		{"XOR A", 1, cpu.XOR_A},              // 0xAF
+		{"OR B", 1, cpu.OR_B},                // 0xB0
+		{"OR C", 1, cpu.OR_C},                // 0xB1
+		{"OR D", 1, cpu.OR_D},                // 0xB2
+		{"OR E", 1, cpu.OR_E},                // 0xB3
+		{"OR H", 1, cpu.OR_H},                // 0xB4
+		{"OR L", 1, cpu.OR_L},                // 0xB5
+		{"OR (HL)", 1, cpu.OR_HL},            // 0xB6
+		{"OR A", 1, cpu.OR_A},                // 0xB7
+		{"CP B", 1, cpu.CP_B},                // 0xB8
+		{"CP C", 1, cpu.CP_C},                // 0xB9
+		{"CP D", 1, cpu.CP_D},                // 0xBA
+		{"CP E", 1, cpu.CP_E},                // 0xBB
+		{"CP H", 1, cpu.CP_H},                // 0xBC
+		{"CP L", 1, cpu.CP_L},                // 0xBD
+		{"CP (HL)", 1, cpu.CP_HL},            // 0xBE
+		{"CP A", 1, cpu.CP_A},                // 0xBF
+		{"RET NZ", 1, cpu.RET_NZ},            // 0xC0
+		{"POP BC", 1, cpu.POP_BC},            // 0xC1
+		{"JP NZ, nn", 3, cpu.JP_NZ_NN},       // 0xC2
+		{"CALL NZ, a16", 3, cpu.CALL_NZ_a16}, // 0xC3
 
 	}
 }
