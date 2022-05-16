@@ -1363,7 +1363,7 @@ func (cpu *CPU) ADD_A_d8(stepInfo *OperandInfo) {
 // 0xC9 - RET
 
 func (cpu *CPU) UNKNOWN(stepInfo *OperandInfo) {
-	fmt.Printf("Unknown opcode!")
+	fmt.Printf("Unknown opcode!\n")
 }
 
 // <----------------------------- EXECUTION -----------------------------> //
