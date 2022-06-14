@@ -34,7 +34,7 @@ type Instruction struct {
 
 type CPU struct {
 	regs       Registers
-	mem        Memory
+	mem        MemoryMap
 	table      [256]Instruction
 	ticksTable [256]uint8
 	ticks      uint32
