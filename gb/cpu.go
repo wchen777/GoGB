@@ -1627,12 +1627,12 @@ func (cpu *CPU) Step() {
 
 	case 2:
 		operand := cpu.mem.Read8(cpu.regs.pc)
-		cpu.regs.pc += uint16(operand)
+		cpu.regs.pc += uint16(operand) // ???
 		instruction.execute(&OperandInfo{operand8: operand})
 
 	case 3:
 		operand := cpu.mem.Read16(cpu.regs.pc)
-		cpu.regs.pc += operand
+		cpu.regs.pc += operand // ???
 		instruction.execute(&OperandInfo{operand16: operand})
 
 	default:
