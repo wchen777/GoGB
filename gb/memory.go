@@ -27,18 +27,8 @@ FFFF - IE Register Interrupt enable flags.
 
 // 64kb memory map
 
-// type Memory struct {
-// 	cart [0x8000]uint8
-// 	sram [0x2000]uint8
-// 	vram [0x2000]uint8
-// 	wram [0x2000]uint8
-// 	oam  [0x100]uint8
-// 	hram [0x80]uint8
-// 	io   [0x100]uint8
-// }
-
 type MemoryMap struct {
-	console *Console      // not sure if we need this?
+	console *Console      // not sure if we need this? for access to other parts of console
 	rom     [0x8000]uint8 // diff between this and cartidge.go? may need to replace this with cartridge.go
 	vram    [0x2000]uint8
 	sram    [0x2000]uint8
