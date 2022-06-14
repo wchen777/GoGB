@@ -38,8 +38,8 @@ FFFF - IE Register Interrupt enable flags.
 // }
 
 type MemoryMap struct {
-	console *Console // not sure if we need this?
-	cart    [0x8000]uint8
+	console *Console      // not sure if we need this?
+	rom     [0x8000]uint8 // diff between this and cartidge.go? may need to replace this with cartridge.go
 	vram    [0x2000]uint8
 	sram    [0x2000]uint8
 	wram    [0x2000]uint8
@@ -64,7 +64,7 @@ const HRAM_END = 0xFFFF
 func (mem *MemoryMap) Write8(address uint16, value uint8) {
 	switch {
 	case address < ROM_END:
-		// cart
+		// rom
 	case address < VRAM_END:
 		// vram
 	case address < SRAM_END:
@@ -93,7 +93,7 @@ func (mem *MemoryMap) Read8(address uint16) uint8 {
 	switch {
 	case address < ROM_END:
 		// cart
-		return mem.cart[address]
+		return mem.rom[address]
 	case address < VRAM_END:
 		// vram
 		return mem.vram[address-ROM_END]
@@ -137,7 +137,11 @@ func (mem *MemoryMap) Read16(address uint16) uint16 {
 	// read twice, at address and address+1
 	// return the double word value
 	// use Read8 to read the low and high bytes
-	return 0
+
+	low := mem.Read8(address)
+	high := mem.Read8(address + 1)
+
+	return uint16(low) | (uint16(high) << 8)
 }
 
 //
