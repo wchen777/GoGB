@@ -9,6 +9,12 @@ type Console struct {
 
 }
 
+func NewConsole(path string) (*Console, error) {
+	// load cartridge from path
+
+	return nil, nil
+}
+
 func (c *Console) Step() int {
 	return 0
 }

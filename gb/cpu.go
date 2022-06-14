@@ -1644,6 +1644,11 @@ func (cpu *CPU) Step() {
 
 }
 
+//
+func (cpu *CPU) HandleInterrupts() {
+
+}
+
 // Reset sets the CPU to a default state
 func (cpu *CPU) Reset() {
 
