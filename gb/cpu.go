@@ -1613,7 +1613,7 @@ func (cpu *CPU) Step() {
 	instruction := cpu.table[opcode]
 
 	// If we can successfully translate the instruction, call our execute method
-	// else panic which now returns the next program counter
+	// else panic
 
 	// check if the instruction is valid/not undefined
 	// if instruction == (Instruction{}) {
